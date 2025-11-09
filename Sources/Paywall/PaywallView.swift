@@ -6,6 +6,8 @@ public struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
+    private let configuration: PaywallConfiguration
+
     @State private var alertMessage: String?
     @State private var isLoading = true
     @State private var selectedPackage: Package?
@@ -15,7 +17,11 @@ public struct PaywallView: View {
     @State private var showFreeTrial = false
     @StateObject private var subscriptionManager = SubscriptionManager.shared
 
-    public init() {}
+    public init(configuration: PaywallConfiguration) {
+        self.configuration = configuration
+    }
+
+    private var accentColor: Color { configuration.accentColor }
 
     public var body: some View {
         GeometryReader { geometry in
@@ -42,7 +48,7 @@ public struct PaywallView: View {
 
     @MainActor
     private func startAnimations() {
-        subscriptionManager.configureIfPossible()
+        subscriptionManager.configure(with: configuration)
         withAnimation {
             showFeatures = true
         }
@@ -89,7 +95,7 @@ public struct PaywallView: View {
                 Circle()
                     .fill(
                         LinearGradient(
-                            gradient: Gradient(colors: [Color.paywallAccent.opacity(0.3), Color.paywallAccent.opacity(0.1)]),
+                            gradient: Gradient(colors: [accentColor.opacity(0.3), accentColor.opacity(0.1)]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -100,7 +106,7 @@ public struct PaywallView: View {
                     .font(.system(size: geometry.size.height < 700 ? 32 : 40, weight: .medium))
                     .foregroundStyle(
                         LinearGradient(
-                            gradient: Gradient(colors: [Color.paywallAccent.opacity(0.7), Color.paywallAccent]),
+                            gradient: Gradient(colors: [accentColor.opacity(0.7), accentColor]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
@@ -126,8 +132,11 @@ public struct PaywallView: View {
 
     @ViewBuilder
     private func featureSection(for geometry: GeometryProxy) -> some View {
-        let features = PaywallFeatureCatalog.highlighted
-        if geometry.size.height >= 700 {
+        let features = configuration.features
+
+        if features.isEmpty {
+            EmptyView()
+        } else if geometry.size.height >= 700 {
             LazyVGrid(columns: [
                 GridItem(.flexible(), spacing: 12),
                 GridItem(.flexible(), spacing: 12)
@@ -165,7 +174,7 @@ public struct PaywallView: View {
             if isLoading {
                 VStack(spacing: 8) {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .paywallAccent))
+                        .progressViewStyle(CircularProgressViewStyle(tint: accentColor))
                     Text("Loading options…")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.gray)
@@ -179,12 +188,12 @@ public struct PaywallView: View {
                             Text("Free Trial")
                                 .font(.system(size: geometry.size.height < 700 ? 16 : 18, weight: .bold))
                                 .foregroundColor(.white)
-                                .shadow(color: .paywallAccent.opacity(0.5), radius: 2, x: 0, y: 1)
+                                .shadow(color: accentColor.opacity(0.5), radius: 2, x: 0, y: 1)
 
                             Spacer()
 
                             Toggle("", isOn: $showFreeTrial)
-                                .toggleStyle(SwitchToggleStyle(tint: .paywallAccent))
+                                .toggleStyle(SwitchToggleStyle(tint: accentColor))
                                 .scaleEffect(0.8)
                                 .onChange(of: showFreeTrial) { _, newValue in
                                     handleFreeTrialToggle(newValue: newValue)
@@ -201,7 +210,8 @@ public struct PaywallView: View {
                             isSelected: selectedPackage?.identifier == package.identifier,
                             onSelect: { selectedPackage = package },
                             isSmallScreen: geometry.size.height < 700,
-                            showFreeTrial: showFreeTrial && package.packageType == .weekly
+                            showFreeTrial: showFreeTrial && package.packageType == .weekly,
+                            accentColor: accentColor
                         )
                         .opacity(showFeatures ? 1 : 0)
                         .offset(y: showFeatures ? 0 : 20)
@@ -236,8 +246,8 @@ public struct PaywallView: View {
             .background(
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        selectedPackage != nil ? Color.paywallAccent : Color.gray,
-                        selectedPackage != nil ? Color.paywallAccent.opacity(0.8) : Color.gray.opacity(0.8)
+                        selectedPackage != nil ? accentColor : Color.gray,
+                        selectedPackage != nil ? accentColor.opacity(0.8) : Color.gray.opacity(0.8)
                     ]),
                     startPoint: .leading,
                     endPoint: .trailing
@@ -248,7 +258,7 @@ public struct PaywallView: View {
                 RoundedRectangle(cornerRadius: geometry.size.height < 700 ? 22 : 24)
                     .stroke(Color.white.opacity(0.2), lineWidth: 1)
             )
-            .shadow(color: (selectedPackage != nil ? Color.paywallAccent : Color.gray).opacity(0.3), radius: 12, x: 0, y: 6)
+            .shadow(color: (selectedPackage != nil ? accentColor : Color.gray).opacity(0.3), radius: 12, x: 0, y: 6)
             .scaleEffect(isPurchasing ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: isPurchasing)
         }
@@ -281,22 +291,30 @@ public struct PaywallView: View {
             .animation(.easeOut(duration: 0.6).delay(1.6), value: showFeatures)
 
             VStack(spacing: 6) {
-                HStack(spacing: 12) {
-                    Button("Privacy Policy") {
-                        openLink("https://amian.github.io/privacy-general")
-                    }
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.gray)
+                if configuration.privacyPolicyURL != nil || configuration.termsOfServiceURL != nil {
+                    HStack(spacing: 12) {
+                        if configuration.privacyPolicyURL != nil {
+                            Button("Privacy Policy") {
+                                openLink(configuration.privacyPolicyURL)
+                            }
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.gray)
+                        }
 
-                    Text("•")
-                        .foregroundColor(.gray.opacity(0.5))
-                        .font(.system(size: 10))
+                        if configuration.privacyPolicyURL != nil && configuration.termsOfServiceURL != nil {
+                            Text("•")
+                                .foregroundColor(.gray.opacity(0.5))
+                                .font(.system(size: 10))
+                        }
 
-                    Button("Terms of Service") {
-                        openLink("https://amian.github.io/terms")
+                        if configuration.termsOfServiceURL != nil {
+                            Button("Terms of Service") {
+                                openLink(configuration.termsOfServiceURL)
+                            }
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.gray)
+                        }
                     }
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.gray)
                 }
 
                 Text("Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.")
@@ -324,17 +342,21 @@ public struct PaywallView: View {
 
     @MainActor
     private func loadOffering() async {
-        guard !RevenueCatConfig.publicSDKKey.isEmpty else {
+        guard !configuration.revenueCatPublicKey.isEmpty else {
             isLoading = false
             return
         }
 
         do {
             let offerings = try await Purchases.shared.offerings()
-            if let specific = offerings.all[RevenueCatConfig.offeringIdentifier] {
+            if
+                let identifier = configuration.offeringIdentifier,
+                let specific = offerings.all[identifier] {
                 offering = specific
             } else if let current = offerings.current {
                 offering = current
+            } else {
+                offering = offerings.all.values.first
             }
 
             if let offering {
@@ -423,8 +445,8 @@ public struct PaywallView: View {
     }
 
     @MainActor
-    private func openLink(_ urlString: String) {
-        guard let url = URL(string: urlString) else { return }
+    private func openLink(_ url: URL?) {
+        guard let url else { return }
         openURL(url)
     }
 }

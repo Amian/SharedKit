@@ -8,6 +8,8 @@ public final class SubscriptionManager: NSObject, ObservableObject {
 
     @Published public private(set) var isPremium: Bool = false
 
+    public private(set) var configuration: PaywallConfiguration?
+
     private var isConfigured = false
     private let storageKey = "com.shareduikit.paywall.premiumUnlocked"
 
@@ -16,16 +18,18 @@ public final class SubscriptionManager: NSObject, ObservableObject {
     }
 
     /// Call as soon as your application launches to configure RevenueCat and hydrate any persisted state.
-    public func configureIfPossible() {
+    public func configure(with configuration: PaywallConfiguration) {
+        self.configuration = configuration
+
         guard !isConfigured else { return }
 
-        guard !RevenueCatConfig.publicSDKKey.isEmpty else {
+        guard !configuration.revenueCatPublicKey.isEmpty else {
             refreshFromStorage()
             isConfigured = true
             return
         }
 
-        Purchases.configure(withAPIKey: RevenueCatConfig.publicSDKKey)
+        Purchases.configure(withAPIKey: configuration.revenueCatPublicKey)
         Purchases.shared.delegate = self
 
         Task { @MainActor [weak self] in

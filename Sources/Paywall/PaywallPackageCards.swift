@@ -5,6 +5,7 @@ struct CompactPremiumPackageCard: View {
     let package: Package
     let isSelected: Bool
     let onSelect: () -> Void
+    let accentColor: Color
 
     private var isPopular: Bool {
         package.packageType == .annual || package.packageType == .sixMonth
@@ -68,7 +69,7 @@ struct CompactPremiumPackageCard: View {
 
                 ZStack {
                     Circle()
-                        .fill(isSelected ? Color.paywallAccent : Color.white.opacity(0.2))
+                        .fill(isSelected ? accentColor : Color.white.opacity(0.2))
                         .frame(width: 20, height: 20)
 
                     if isSelected {
@@ -82,11 +83,11 @@ struct CompactPremiumPackageCard: View {
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color.paywallAccent.opacity(0.2) : Color.white.opacity(0.05))
+                    .fill(isSelected ? accentColor.opacity(0.2) : Color.white.opacity(0.05))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(
-                                isSelected ? Color.paywallAccent : Color.white.opacity(0.1),
+                                isSelected ? accentColor : Color.white.opacity(0.1),
                                 lineWidth: isSelected ? 2 : 1
                             )
                     )
@@ -122,6 +123,7 @@ struct UltraCompactPackageCard: View {
     let onSelect: () -> Void
     let isSmallScreen: Bool
     let showFreeTrial: Bool
+    let accentColor: Color
 
     private var isPopular: Bool {
         package.packageType == .annual || package.packageType == .sixMonth
@@ -194,7 +196,7 @@ struct UltraCompactPackageCard: View {
 
                 ZStack {
                     Circle()
-                        .fill(isSelected ? Color.paywallAccent : Color.white.opacity(0.2))
+                        .fill(isSelected ? accentColor : Color.white.opacity(0.2))
                         .frame(width: 16, height: 16)
 
                     if isSelected {
@@ -209,11 +211,11 @@ struct UltraCompactPackageCard: View {
             .padding(.vertical, isSmallScreen ? 8 : 10)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(isSelected ? Color.paywallAccent.opacity(0.2) : Color.white.opacity(0.05))
+                    .fill(isSelected ? accentColor.opacity(0.2) : Color.white.opacity(0.05))
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(
-                                isSelected ? Color.paywallAccent : Color.white.opacity(0.1),
+                                isSelected ? accentColor : Color.white.opacity(0.1),
                                 lineWidth: isSelected ? 2 : 1
                             )
                     )

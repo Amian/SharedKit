@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CompactFeatureCard: View {
-    let feature: PremiumFeature
+    let feature: PaywallFeature
 
     var body: some View {
         VStack(spacing: 8) {
@@ -42,7 +42,7 @@ struct CompactFeatureCard: View {
 }
 
 struct CompactFeatureRow: View {
-    let feature: PremiumFeature
+    let feature: PaywallFeature
 
     var body: some View {
         HStack(spacing: 12) {
