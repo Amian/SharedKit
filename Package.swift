@@ -10,18 +10,23 @@ let package = Package(
         .macOS(.v10_15),
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "SharedUIKit",
-            targets: ["SharedUIKit"]
+            name: "Paywall",
+            targets: ["Paywall"]
+        ),
+    ],
+    dependencies: [
+        .package(
+            url: "https://github.com/RevenueCat/purchases-ios.git",
+            from: "4.33.0"
         ),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "SharedUIKit"
+            name: "Paywall",
+            dependencies: [
+                .product(name: "RevenueCat", package: "purchases-ios"),
+            ]
         ),
-
     ]
 )
