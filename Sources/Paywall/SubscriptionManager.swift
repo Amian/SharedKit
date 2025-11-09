@@ -1,5 +1,4 @@
 import Foundation
-import SwiftData
 import RevenueCat
 
 @available(iOS 17.0, macOS 14.0, *)
@@ -17,11 +16,11 @@ public final class SubscriptionManager: NSObject, ObservableObject {
     }
 
     /// Call as soon as your application launches to configure RevenueCat and hydrate any persisted state.
-    public func configureIfPossible(modelContext: ModelContext? = nil) {
+    public func configureIfPossible() {
         guard !isConfigured else { return }
 
         guard !RevenueCatConfig.publicSDKKey.isEmpty else {
-            refreshFromStorage(modelContext: modelContext)
+            refreshFromStorage()
             isConfigured = true
             return
         }
@@ -29,60 +28,36 @@ public final class SubscriptionManager: NSObject, ObservableObject {
         Purchases.configure(withAPIKey: RevenueCatConfig.publicSDKKey)
         Purchases.shared.delegate = self
 
-        Task { @MainActor in
-            await loadCustomerInfo(modelContext: modelContext)
+        Task { @MainActor [weak self] in
+            await self?.loadCustomerInfo()
         }
 
         isConfigured = true
     }
 
-    /// Reads the persisted premium state either from SwiftData or UserDefaults.
-    public func refreshFromStorage(modelContext: ModelContext? = nil) {
-        if let context = modelContext, let existing = fetchSettings(in: context) {
-            isPremium = existing.premiumUnlocked
-        } else {
-            isPremium = UserDefaults.standard.bool(forKey: storageKey)
-        }
+    /// Reads the persisted premium state from UserDefaults.
+    public func refreshFromStorage() {
+        isPremium = UserDefaults.standard.bool(forKey: storageKey)
     }
 
-    /// Persists the premium flag to both SwiftData and UserDefaults for resiliency.
-    public func persistPremium(_ enabled: Bool, modelContext: ModelContext? = nil) {
-        if let context = modelContext {
-            let settings: PaywallSettings
-            if let existing = fetchSettings(in: context) {
-                settings = existing
-            } else {
-                let created = PaywallSettings()
-                context.insert(created)
-                settings = created
-            }
-
-            settings.premiumUnlocked = enabled
-            settings.lastUpdated = .now
-            try? context.save()
-        }
-
+    /// Persists the premium flag in UserDefaults.
+    public func persistPremium(_ enabled: Bool) {
         UserDefaults.standard.set(enabled, forKey: storageKey)
         isPremium = enabled
     }
 
-    private func fetchSettings(in context: ModelContext) -> PaywallSettings? {
-        let descriptor = FetchDescriptor<PaywallSettings>(predicate: nil)
-        return try? context.fetch(descriptor).first
-    }
-
-    private func loadCustomerInfo(modelContext: ModelContext?) async {
+    private func loadCustomerInfo() async {
         do {
             let info = try await Purchases.shared.customerInfo()
-            updatePremiumStatus(from: info, modelContext: modelContext)
+            updatePremiumStatus(from: info)
         } catch {
-            refreshFromStorage(modelContext: modelContext)
+            refreshFromStorage()
         }
     }
 
-    private func updatePremiumStatus(from info: CustomerInfo?, modelContext: ModelContext?) {
+    private func updatePremiumStatus(from info: CustomerInfo?) {
         let hasActive = !(info?.entitlements.active.isEmpty ?? true)
-        persistPremium(hasActive, modelContext: modelContext)
+        persistPremium(hasActive)
     }
 }
 
@@ -90,7 +65,7 @@ public final class SubscriptionManager: NSObject, ObservableObject {
 extension SubscriptionManager: PurchasesDelegate {
     nonisolated public func purchases(_ purchases: Purchases, receivedUpdated customerInfo: CustomerInfo) {
         Task { @MainActor [weak self] in
-            self?.updatePremiumStatus(from: customerInfo, modelContext: nil)
+            self?.updatePremiumStatus(from: customerInfo)
         }
     }
 }

@@ -1,13 +1,10 @@
 import SwiftUI
-import SwiftData
 import RevenueCat
 
 @available(iOS 17.0, macOS 14.0, *)
 public struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
-
-    private let persistentModelContext: ModelContext?
 
     @State private var alertMessage: String?
     @State private var isLoading = true
@@ -18,9 +15,7 @@ public struct PaywallView: View {
     @State private var showFreeTrial = false
     @StateObject private var subscriptionManager = SubscriptionManager.shared
 
-    public init(modelContext: ModelContext? = nil) {
-        self.persistentModelContext = modelContext
-    }
+    public init() {}
 
     public var body: some View {
         GeometryReader { geometry in
@@ -47,7 +42,7 @@ public struct PaywallView: View {
 
     @MainActor
     private func startAnimations() {
-        subscriptionManager.configureIfPossible(modelContext: persistentModelContext)
+        subscriptionManager.configureIfPossible()
         withAnimation {
             showFeatures = true
         }
@@ -398,7 +393,7 @@ public struct PaywallView: View {
             let result = try await Purchases.shared.purchase(package: package)
             if !result.userCancelled {
                 let hasActiveEntitlements = !result.customerInfo.entitlements.active.isEmpty
-                subscriptionManager.persistPremium(hasActiveEntitlements, modelContext: persistentModelContext)
+                subscriptionManager.persistPremium(hasActiveEntitlements)
                 try? await Task.sleep(nanoseconds: 500_000_000)
                 dismiss()
             }
@@ -415,7 +410,7 @@ public struct PaywallView: View {
                 let customerInfo = try await Purchases.shared.restorePurchases()
                 let hasActiveEntitlements = !customerInfo.entitlements.active.isEmpty
                 if hasActiveEntitlements {
-                    subscriptionManager.persistPremium(hasActiveEntitlements, modelContext: persistentModelContext)
+                    subscriptionManager.persistPremium(hasActiveEntitlements)
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     dismiss()
                 } else {
