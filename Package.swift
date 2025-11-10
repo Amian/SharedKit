@@ -14,6 +14,10 @@ let package = Package(
             name: "Paywall",
             targets: ["Paywall"]
         ),
+        .library(
+            name: "Onboarding",
+            targets: ["Onboarding"]
+        ),
     ],
     dependencies: [
         .package(
@@ -27,6 +31,9 @@ let package = Package(
             dependencies: [
                 .product(name: "RevenueCat", package: "purchases-ios"),
             ]
+        ),
+        .target(
+            name: "Onboarding"
         ),
     ]
 )

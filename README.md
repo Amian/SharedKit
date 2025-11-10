@@ -1,13 +1,15 @@
 # SharedUIKit Paywall
 
-`SharedUIKit` is a Swift Package that currently exposes a single `Paywall` module.  
-The module bundles the RevenueCat-driven paywall UI, a lightweight subscription manager, and supporting models so you can drop a polished paywall into any of your apps.
+`SharedUIKit` is a Swift Package that currently exposes two SwiftUI modules:
+
+- `Paywall`: RevenueCat-driven subscription paywall plus entitlement manager.
+- `Onboarding`: simple, configurable welcome screen you can reuse across apps.
 
 ## 1. Add the Package
 
 1. **Xcode** → **Package Dependencies** → **Add Package Dependency…**
 2. Enter the repo URL (e.g. `https://github.com/<you>/SharedUIKit.git`)
-3. When prompted for products, select **Paywall**.
+3. When prompted for products, select **Paywall** and/or **Onboarding** depending on what you need.
 
 `Package.swift` excerpt if you prefer manual editing:
 
@@ -20,6 +22,7 @@ targets: [
         name: "MyApp",
         dependencies: [
             .product(name: "Paywall", package: "SharedUIKit"),
+            .product(name: "Onboarding", package: "SharedUIKit")
         ]
     )
 ]
@@ -148,3 +151,76 @@ The structure is intentionally simple: add new shared UI modules as separate tar
 ---
 
 Need help or want to add another UI surface (onboarding, settings, etc.)? Follow the same pattern: new target, dedicated files, and opt-in product in `Package.swift`.
+
+---
+
+## Onboarding Module
+
+`Onboarding` now supports multi-step flows composed of two step types:
+
+- `.info`: hero/welcome/validation screens (image + headline + CTA).
+- `.question`: multiple-choice prompts where users select one or more answers.
+
+### Configure steps
+
+```swift
+import Onboarding
+
+let steps: [OnboardingStep] = [
+    .info(
+        OnboardingInfoStep(
+            imageName: "Mascot",
+            title: "duolingo",
+            subtitle: "Learn for free. Forever.",
+            ctaTitle: "Get Started",
+            accentColor: .green,
+            backgroundColor: Color(red: 0.06, green: 0.08, blue: 0.12),
+            appearance: .dark
+        )
+    ),
+    .question(
+        OnboardingQuestionStep(
+            title: "Which language are you learning?",
+            subtitle: "Pick as many as you like.",
+            allowsMultipleSelection: true,
+            options: [
+                OnboardingOption(title: "Spanish", iconName: "flag.fill"),
+                OnboardingOption(title: "French", iconName: "flag.fill"),
+                OnboardingOption(title: "Japanese", iconName: "flag.fill")
+            ],
+            ctaTitle: "Continue",
+            accentColor: .green,
+            backgroundColor: Color(UIColor.systemBackground)
+        )
+    ),
+    .info(
+        OnboardingInfoStep(
+            title: "You're all set!",
+            subtitle: "Let's personalize your experience.",
+            ctaTitle: "Finish"
+        )
+    )
+]
+```
+
+### Present the flow
+
+```swift
+struct OnboardingContainer: View {
+    @State private var answers: [OnboardingResponse] = []
+    @State private var completed = false
+
+    var body: some View {
+        if completed {
+            MainAppView()
+        } else {
+            OnboardingFlowView(steps: steps) { responses in
+                answers = responses
+                completed = true
+            }
+        }
+    }
+}
+```
+
+The `OnboardingFlowView` handles navigation, option selection, and progress. The completion closure gives you every step plus the selected option IDs (if applicable) so you can store analytics or personalize subsequent UI.
