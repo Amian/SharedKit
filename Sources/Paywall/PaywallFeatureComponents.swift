@@ -1,80 +1,48 @@
 import SwiftUI
 
-struct CompactFeatureCard: View {
+struct CompactFeatureRow: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let feature: PaywallFeature
 
+    private var titleColor: Color { colorScheme == .dark ? .white : .black }
+    private var subtitleColor: Color {
+        colorScheme == .dark ? Color.white.opacity(0.7) : Color.black.opacity(0.7)
+    }
+
     var body: some View {
-        VStack(spacing: 8) {
+        HStack(alignment: .top, spacing: 12) {
             ZStack {
-                RoundedRectangle(cornerRadius: 8)
+                Circle()
                     .fill(feature.color.opacity(0.15))
                     .frame(width: 32, height: 32)
 
                 Image(systemName: feature.icon)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.system(size: 15, weight: .medium))
                     .foregroundColor(feature.color)
             }
 
-            VStack(spacing: 2) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(feature.title)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(titleColor)
+
+                if let subtitle = feature.subtitle, !subtitle.isEmpty {
+                    Text(subtitle)
+                        .font(.system(size: 13))
+                        .foregroundColor(subtitleColor)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                }
             }
-
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.green)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .padding(.horizontal, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(feature.color.opacity(0.2), lineWidth: 1)
-                )
-        )
-    }
-}
-
-struct CompactFeatureRow: View {
-    let feature: PaywallFeature
-
-    var body: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(feature.color.opacity(0.15))
-                    .frame(width: 24, height: 24)
-
-                Image(systemName: feature.icon)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(feature.color)
-            }
-
-            Text(feature.title)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.white)
 
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.green)
+                .padding(.top, 4)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(feature.color.opacity(0.2), lineWidth: 1)
-                )
-        )
+        .padding(.vertical, 6)
     }
 }

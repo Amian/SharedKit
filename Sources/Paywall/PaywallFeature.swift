@@ -4,7 +4,7 @@ public struct PaywallFeature: Identifiable, Hashable {
     public let id: UUID
     public var icon: String
     public var title: String
-    public var subtitle: String
+    public var subtitle: String?
     public var color: Color
     public var delay: Double
 
@@ -12,7 +12,7 @@ public struct PaywallFeature: Identifiable, Hashable {
         id: UUID = UUID(),
         icon: String,
         title: String,
-        subtitle: String,
+        subtitle: String? = nil,
         color: Color,
         delay: Double = 0.0
     ) {

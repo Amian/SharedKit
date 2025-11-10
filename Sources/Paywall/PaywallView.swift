@@ -5,6 +5,7 @@ import RevenueCat
 public struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    @Environment(\.colorScheme) private var systemColorScheme
 
     private let configuration: PaywallConfiguration
 
@@ -15,18 +16,46 @@ public struct PaywallView: View {
     @State private var isPurchasing = false
     @State private var showFeatures = false
     @State private var showFreeTrial = false
+    @State private var showCloseButton = false
     @StateObject private var subscriptionManager = SubscriptionManager.shared
 
-    public init(configuration: PaywallConfiguration) {
-        self.configuration = configuration
+    public init(configuration: PaywallConfiguration? = nil) {
+        if let configuration {
+            self.configuration = configuration
+            SubscriptionManager.shared.configure(with: configuration)
+        } else if let shared = Paywall.configuration {
+            self.configuration = shared
+        } else {
+            fatalError("PaywallView requires a configuration. Call Paywall.configure(with:) during app launch or pass one to PaywallView(configuration:).")
+        }
     }
 
     private var accentColor: Color { configuration.accentColor }
+    private var resolvedColorScheme: ColorScheme {
+        configuration.appearance.preferredColorScheme ?? systemColorScheme
+    }
+    private var primaryTextColor: Color { resolvedColorScheme == .dark ? .white : .black }
+    private var secondaryTextColor: Color {
+        resolvedColorScheme == .dark ? Color.white.opacity(0.7) : Color.black.opacity(0.7)
+    }
+    private var mutedTextColor: Color {
+        resolvedColorScheme == .dark ? Color.white.opacity(0.6) : Color.black.opacity(0.6)
+    }
+    private var backgroundColor: Color { Color(UIColor.systemBackground) }
+    private var surfaceColor: Color {
+        resolvedColorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05)
+    }
+    private var surfaceBorderColor: Color {
+        resolvedColorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.1)
+    }
+    private var chipBackgroundColor: Color {
+        resolvedColorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05)
+    }
 
     public var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Color.black
+                backgroundColor
                     .ignoresSafeArea()
 
                 ScrollView {
@@ -44,13 +73,18 @@ public struct PaywallView: View {
         } message: {
             Text(alertMessage ?? "")
         }
+        .preferredColorScheme(configuration.appearance.preferredColorScheme)
     }
 
     @MainActor
     private func startAnimations() {
-        subscriptionManager.configure(with: configuration)
         withAnimation {
             showFeatures = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.7) {
+            withAnimation(.easeOut(duration: 0.4)) {
+                showCloseButton = true
+            }
         }
     }
 
@@ -75,21 +109,20 @@ public struct PaywallView: View {
 
     private func headerSection(geometry: GeometryProxy) -> some View {
         VStack(spacing: geometry.size.height < 700 ? 8 : 12) {
-            HStack {
-                Spacer()
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(.gray)
-                        .frame(width: 32, height: 32)
-                        .background(Color.white.opacity(0.1))
-                        .clipShape(Circle())
+                HStack {
+                    Spacer()
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(secondaryTextColor)
+                            .frame(width: 32, height: 32)
+                            .background(chipBackgroundColor)
+                            .clipShape(Circle())
+                    }
                 }
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
-            .opacity(showFeatures ? 1 : 0)
-            .animation(.easeOut(duration: 0.6).delay(0.2), value: showFeatures)
+                .padding(.horizontal, 20)
+                .padding(.top, 8)
+                .opacity(showCloseButton ? 1 : 0)
 
             ZStack {
                 Circle()
@@ -116,16 +149,17 @@ public struct PaywallView: View {
             }
 
             VStack(spacing: 4) {
-                Text("Unlock Premium")
+                Text(configuration.headline)
                     .font(.system(size: geometry.size.height < 700 ? 24 : 28, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                    .foregroundColor(primaryTextColor)
                     .multilineTextAlignment(.center)
 
-                Text("Track unlimited activities and unlock your full potential")
+                Text(configuration.subheadline)
                     .font(.system(size: geometry.size.height < 700 ? 14 : 16, weight: .medium))
-                    .foregroundColor(.gray)
+                    .foregroundColor(secondaryTextColor)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
+                    .lineLimit(nil)
             }
         }
     }
@@ -136,22 +170,9 @@ public struct PaywallView: View {
 
         if features.isEmpty {
             EmptyView()
-        } else if geometry.size.height >= 700 {
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: 12),
-                GridItem(.flexible(), spacing: 12)
-            ], spacing: 12) {
-                ForEach(features.prefix(4)) { feature in
-                    CompactFeatureCard(feature: feature)
-                        .opacity(showFeatures ? 1 : 0)
-                        .offset(x: showFeatures ? 0 : 30)
-                        .animation(.easeOut(duration: 0.6).delay(feature.delay), value: showFeatures)
-                }
-            }
-            .padding(.horizontal, 20)
         } else {
             VStack(spacing: 8) {
-                ForEach(Array(features.prefix(3).enumerated()), id: \.element.id) { entry in
+                ForEach(Array(features.enumerated()), id: \.element.id) { entry in
                     CompactFeatureRow(feature: entry.element)
                         .opacity(showFeatures ? 1 : 0)
                         .offset(x: showFeatures ? 0 : 30)
@@ -167,7 +188,7 @@ public struct PaywallView: View {
         VStack(spacing: 12) {
             Text("Choose Your Plan")
                 .font(.system(size: geometry.size.height < 700 ? 16 : 18, weight: .bold))
-                .foregroundColor(.white)
+                .foregroundColor(primaryTextColor)
                 .opacity(showFeatures ? 1 : 0)
                 .animation(.easeOut(duration: 0.6).delay(0.8), value: showFeatures)
 
@@ -177,7 +198,7 @@ public struct PaywallView: View {
                         .progressViewStyle(CircularProgressViewStyle(tint: accentColor))
                     Text("Loading options…")
                         .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.gray)
+                        .foregroundColor(secondaryTextColor)
                 }
                 .padding(.vertical, 16)
             } else if let offering {
@@ -187,7 +208,7 @@ public struct PaywallView: View {
                         HStack {
                             Text("Free Trial")
                                 .font(.system(size: geometry.size.height < 700 ? 16 : 18, weight: .bold))
-                                .foregroundColor(.white)
+                                .foregroundColor(primaryTextColor)
                                 .shadow(color: accentColor.opacity(0.5), radius: 2, x: 0, y: 1)
 
                             Spacer()
@@ -221,7 +242,7 @@ public struct PaywallView: View {
             } else {
                 Text("No packages available right now. Please try again later.")
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.gray)
+                    .foregroundColor(secondaryTextColor)
                     .padding(.vertical, 12)
             }
         }
@@ -256,7 +277,7 @@ public struct PaywallView: View {
             .clipShape(RoundedRectangle(cornerRadius: geometry.size.height < 700 ? 22 : 24))
             .overlay(
                 RoundedRectangle(cornerRadius: geometry.size.height < 700 ? 22 : 24)
-                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    .stroke(surfaceBorderColor, lineWidth: 1)
             )
             .shadow(color: (selectedPackage != nil ? accentColor : Color.gray).opacity(0.3), radius: 12, x: 0, y: 6)
             .scaleEffect(isPurchasing ? 0.95 : 1.0)
@@ -281,10 +302,10 @@ public struct PaywallView: View {
             Button(action: restorePurchases) {
                 Text("Restore Purchases")
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.gray)
+                    .foregroundColor(secondaryTextColor)
                     .padding(.vertical, 6)
                     .padding(.horizontal, 12)
-                    .background(Color.white.opacity(0.05))
+                    .background(surfaceColor)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
             .opacity(showFeatures ? 1 : 0)
@@ -298,12 +319,12 @@ public struct PaywallView: View {
                                 openLink(configuration.privacyPolicyURL)
                             }
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.gray)
+                            .foregroundColor(secondaryTextColor)
                         }
 
                         if configuration.privacyPolicyURL != nil && configuration.termsOfServiceURL != nil {
                             Text("•")
-                                .foregroundColor(.gray.opacity(0.5))
+                                .foregroundColor(secondaryTextColor.opacity(0.5))
                                 .font(.system(size: 10))
                         }
 
@@ -312,14 +333,14 @@ public struct PaywallView: View {
                                 openLink(configuration.termsOfServiceURL)
                             }
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.gray)
+                            .foregroundColor(secondaryTextColor)
                         }
                     }
                 }
 
                 Text("Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.")
                     .font(.system(size: 9, weight: .regular))
-                    .foregroundColor(.gray.opacity(0.6))
+                    .foregroundColor(mutedTextColor)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
                     .lineLimit(geometry.size.height < 700 ? 4 : 3)
@@ -332,12 +353,12 @@ public struct PaywallView: View {
     }
 
     private var ctaButtonText: String {
-        guard let selectedPackage else { return "Start Premium" }
+        guard let selectedPackage else { return "Unlock Premium" }
         if showFreeTrial && selectedPackage.packageType == .weekly,
            selectedPackage.storeProduct.introductoryDiscount != nil {
             return "Start Free Trial"
         }
-        return "Start Premium"
+        return "Unlock Premium"
     }
 
     @MainActor

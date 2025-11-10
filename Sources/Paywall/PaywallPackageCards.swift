@@ -2,10 +2,23 @@ import SwiftUI
 import RevenueCat
 
 struct CompactPremiumPackageCard: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let package: Package
     let isSelected: Bool
     let onSelect: () -> Void
     let accentColor: Color
+
+    private var primaryTextColor: Color { colorScheme == .dark ? .white : .black }
+    private var secondaryTextColor: Color {
+        colorScheme == .dark ? Color.white.opacity(0.7) : Color.black.opacity(0.7)
+    }
+    private var surfaceColor: Color {
+        colorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05)
+    }
+    private var borderColor: Color {
+        colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.1)
+    }
 
     private var isPopular: Bool {
         package.packageType == .annual || package.packageType == .sixMonth
@@ -29,7 +42,7 @@ struct CompactPremiumPackageCard: View {
                     HStack(spacing: 6) {
                         Text(package.storeProduct.localizedTitle)
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(primaryTextColor)
 
                         if isPopular {
                             Text("POPULAR")
@@ -50,7 +63,7 @@ struct CompactPremiumPackageCard: View {
 
                     Text(priceDescription)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.gray)
+                        .foregroundColor(secondaryTextColor)
                 }
 
                 Spacer()
@@ -58,12 +71,12 @@ struct CompactPremiumPackageCard: View {
                 VStack(alignment: .trailing, spacing: 1) {
                     Text(package.storeProduct.localizedPriceString)
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(primaryTextColor)
 
                     if package.packageType != .monthly {
                         Text("per year")
                             .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(.gray)
+                            .foregroundColor(secondaryTextColor)
                     }
                 }
 
@@ -83,11 +96,11 @@ struct CompactPremiumPackageCard: View {
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? accentColor.opacity(0.2) : Color.white.opacity(0.05))
+                    .fill(isSelected ? accentColor.opacity(0.2) : surfaceColor)
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(
-                                isSelected ? accentColor : Color.white.opacity(0.1),
+                                isSelected ? accentColor : borderColor,
                                 lineWidth: isSelected ? 2 : 1
                             )
                     )
@@ -118,12 +131,25 @@ struct CompactPremiumPackageCard: View {
 }
 
 struct UltraCompactPackageCard: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let package: Package
     let isSelected: Bool
     let onSelect: () -> Void
     let isSmallScreen: Bool
     let showFreeTrial: Bool
     let accentColor: Color
+
+    private var primaryTextColor: Color { colorScheme == .dark ? .white : .black }
+    private var secondaryTextColor: Color {
+        colorScheme == .dark ? Color.white.opacity(0.7) : Color.black.opacity(0.7)
+    }
+    private var surfaceColor: Color {
+        colorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05)
+    }
+    private var borderColor: Color {
+        colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.1)
+    }
 
     private var isPopular: Bool {
         package.packageType == .annual || package.packageType == .sixMonth
@@ -147,7 +173,7 @@ struct UltraCompactPackageCard: View {
                     HStack(spacing: 4) {
                         Text(package.storeProduct.localizedTitle)
                             .font(.system(size: isSmallScreen ? 13 : 14, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(primaryTextColor)
 
                         if isPopular {
                             Text("POPULAR")
@@ -169,7 +195,7 @@ struct UltraCompactPackageCard: View {
                     if showFreeTrial, package.storeProduct.introductoryDiscount != nil {
                         Text(freeTrialDurationText)
                             .font(.system(size: isSmallScreen ? 9 : 10, weight: .medium))
-                            .foregroundColor(.gray)
+                            .foregroundColor(secondaryTextColor)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
                     }
@@ -190,13 +216,13 @@ struct UltraCompactPackageCard: View {
                     } else {
                         Text(package.storeProduct.localizedPriceString)
                             .font(.system(size: isSmallScreen ? 14 : 16, weight: .bold))
-                            .foregroundColor(.white)
+                            .foregroundColor(primaryTextColor)
                     }
                 }
 
                 ZStack {
                     Circle()
-                        .fill(isSelected ? accentColor : Color.white.opacity(0.2))
+                        .fill(isSelected ? accentColor : borderColor)
                         .frame(width: 16, height: 16)
 
                     if isSelected {
@@ -211,11 +237,11 @@ struct UltraCompactPackageCard: View {
             .padding(.vertical, isSmallScreen ? 8 : 10)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(isSelected ? accentColor.opacity(0.2) : Color.white.opacity(0.05))
+                    .fill(isSelected ? accentColor.opacity(0.2) : surfaceColor)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(
-                                isSelected ? accentColor : Color.white.opacity(0.1),
+                                isSelected ? accentColor : borderColor,
                                 lineWidth: isSelected ? 2 : 1
                             )
                     )
