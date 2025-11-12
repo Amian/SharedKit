@@ -1,4 +1,5 @@
 import SwiftUI
+import DesignSystem
 
 @available(iOS 15.0, macOS 12.0, *)
 struct OnboardingQuestionView: View {
@@ -7,6 +8,7 @@ struct OnboardingQuestionView: View {
     let onAdvance: () -> Void
 
     @Environment(\.colorScheme) private var systemScheme
+    @Environment(\.designTypography) private var typography
 
     var body: some View {
         ZStack {
@@ -14,7 +16,7 @@ struct OnboardingQuestionView: View {
 
             VStack(spacing: 0) {
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .leading, spacing: 20) {
                         if let imageName = step.imageName {
                             Image(imageName)
                                 .resizable()
@@ -28,19 +30,19 @@ struct OnboardingQuestionView: View {
                         optionList
                     }
                     .frame(maxWidth: 440)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 32)
-                    .padding(.bottom, 12)
+                    .padding(.horizontal, 18)
+                    .padding(.top, 20)
+                    .padding(.bottom, 6)
                     .frame(maxWidth: .infinity)
                 }
 
                 primaryButton
                     .frame(maxWidth: 440)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 24)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 10)
+                    .padding(.bottom, 8)
             }
         }
-        .ignoresSafeArea(edges: .bottom)
         .preferredColorScheme(step.appearance.preferredColorScheme)
     }
 
@@ -100,15 +102,15 @@ struct OnboardingQuestionView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             Text(step.title)
-                .font(.system(size: 32, weight: .bold))
+                .font(typography.title)
                 .foregroundColor(titleColor)
                 .lineSpacing(4)
 
             if let subtitle = step.subtitle {
                 Text(subtitle)
-                    .font(.system(size: 16, weight: .regular))
+                    .font(typography.subtitle)
                     .foregroundColor(subtitleColor)
                     .lineSpacing(4)
             }
@@ -117,7 +119,7 @@ struct OnboardingQuestionView: View {
     }
 
     private var optionList: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 10) {
             ForEach(step.options) { option in
                 Button {
                     toggleSelection(for: option.id)
@@ -137,10 +139,10 @@ struct OnboardingQuestionView: View {
     private var primaryButton: some View {
         Button(action: onAdvance) {
             Text(step.ctaTitle)
-                .font(.system(size: 16, weight: .semibold))
+                .font(typography.cta)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .frame(height: 56)
+                .frame(height: 52)
                 .background(accentGradient)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .shadow(color: step.accentColor.opacity(0.32), radius: 16, x: 0, y: 10)
@@ -151,8 +153,8 @@ struct OnboardingQuestionView: View {
     }
 
     private var accentGradient: LinearGradient {
-        let start = step.accentColor.onboardingLighten(by: 0.12)
-        let end = step.accentColor.onboardingDarken(by: 0.05)
+        let start = step.accentColor.designLighten(by: 0.12)
+        let end = step.accentColor.designDarken(by: 0.05)
         return LinearGradient(
             gradient: Gradient(colors: [start, end]),
             startPoint: .leading,

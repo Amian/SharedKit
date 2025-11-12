@@ -1,10 +1,5 @@
 import SwiftUI
-#if canImport(UIKit)
-import UIKit
-#endif
-#if canImport(AppKit)
-import AppKit
-#endif
+import DesignSystem
 
 public enum OnboardingAppearancePreference: Hashable {
     case system
@@ -42,6 +37,7 @@ public struct OnboardingOption: Identifiable, Hashable {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, *)
 public struct OnboardingInfoStep: Hashable {
     public var imageName: String?
     public var title: String
@@ -57,7 +53,7 @@ public struct OnboardingInfoStep: Hashable {
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
         accentColor: Color = Color.green,
-        backgroundColor: Color = .onboardingSystemBackground,
+        backgroundColor: Color = .designSystemBackground,
         appearance: OnboardingAppearancePreference = .system
     ) {
         self.imageName = imageName
@@ -70,6 +66,7 @@ public struct OnboardingInfoStep: Hashable {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, *)
 public struct OnboardingQuestionStep: Hashable {
     public var imageName: String?
     public var title: String
@@ -89,7 +86,7 @@ public struct OnboardingQuestionStep: Hashable {
         options: [OnboardingOption],
         ctaTitle: String = "Continue",
         accentColor: Color = Color.green,
-        backgroundColor: Color = .onboardingSystemBackground,
+        backgroundColor: Color = .designSystemBackground,
         appearance: OnboardingAppearancePreference = .system
     ) {
         self.imageName = imageName
@@ -104,25 +101,15 @@ public struct OnboardingQuestionStep: Hashable {
     }
 }
 
+@available(iOS 15.0, macOS 12.0, *)
 public enum OnboardingStep: Hashable {
     case info(OnboardingInfoStep)
     case question(OnboardingQuestionStep)
 }
 
+@available(iOS 15.0, macOS 12.0, *)
 public struct OnboardingResponse {
     public let stepIndex: Int
     public let step: OnboardingStep
     public let selectedOptionIDs: [UUID]?
-}
-
-public extension Color {
-    static var onboardingSystemBackground: Color {
-        #if canImport(UIKit)
-        return Color(UIColor.systemBackground)
-        #elseif canImport(AppKit)
-        return Color(NSColor.windowBackgroundColor)
-        #else
-        return Color.white
-        #endif
-    }
 }

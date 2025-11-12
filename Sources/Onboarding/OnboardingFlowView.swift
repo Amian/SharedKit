@@ -1,4 +1,5 @@
 import SwiftUI
+import DesignSystem
 
 @available(iOS 15.0, macOS 12.0, *)
 public struct OnboardingFlowView: View {
@@ -25,9 +26,9 @@ public struct OnboardingFlowView: View {
         VStack(spacing: 0) {
             if steps.count > 1 {
                 progressOverlay
-                    .padding(.horizontal, 32)
-                    .padding(.top, 40)
-                    .padding(.bottom, 28)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 28)
+                    .padding(.bottom, 12)
             } else {
                 Spacer(minLength: 32)
             }
@@ -71,8 +72,8 @@ public struct OnboardingFlowView: View {
 
     private var progressActiveGradient: LinearGradient {
         let accent = accentColor(for: steps[currentIndex])
-        let start = accent.onboardingLighten(by: 0.15)
-        let end = accent.onboardingDarken(by: 0.05)
+        let start = accent.designLighten(by: 0.15)
+        let end = accent.designDarken(by: 0.05)
         return LinearGradient(
             gradient: Gradient(colors: [start, end]),
             startPoint: .leading,

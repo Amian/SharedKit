@@ -1,8 +1,10 @@
 import SwiftUI
+import DesignSystem
 
 @available(iOS 15.0, macOS 12.0, *)
 struct OnboardingOptionRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.designTypography) private var typography
 
     let option: OnboardingOption
     let isSelected: Bool
@@ -10,33 +12,33 @@ struct OnboardingOptionRow: View {
     let allowsMultipleSelection: Bool
 
     var body: some View {
-        let cornerRadius: CGFloat = 20
+        let cornerRadius: CGFloat = 16
 
-        HStack(spacing: 16) {
+        HStack(spacing: 10) {
             if let iconName = option.iconName {
                 iconView(systemName: iconName)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(option.title)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(typography.optionTitle)
                     .foregroundColor(titleColor)
 
                 if let subtitle = option.subtitle, !subtitle.isEmpty {
                     Text(subtitle)
-                        .font(.system(size: 14, weight: .regular))
+                        .font(typography.optionSubtitle)
                         .foregroundColor(subtitleColor)
                         .lineSpacing(2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
 
-            Spacer(minLength: 12)
+            Spacer(minLength: 8)
 
             selectionIndicator
         }
-        .padding(.vertical, 18)
-        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 14)
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
@@ -75,7 +77,7 @@ struct OnboardingOptionRow: View {
     }
 
     private var iconBackgroundColor: Color {
-        iconBaseColor.onboardingLighten(by: colorScheme == .dark ? 0.2 : 0.6).opacity(colorScheme == .dark ? 0.35 : 0.25)
+        iconBaseColor.designLighten(by: colorScheme == .dark ? 0.2 : 0.6).opacity(colorScheme == .dark ? 0.35 : 0.25)
     }
 
     @ViewBuilder
@@ -123,7 +125,7 @@ struct OnboardingOptionRow: View {
                 )
 
             Image(systemName: "checkmark")
-                .font(.system(size: 12, weight: .bold))
+                .font(typography.optionCheckmark)
                 .foregroundColor(.white)
                 .opacity(isSelected ? 1 : 0)
                 .animation(.easeOut(duration: 0.2), value: isSelected)
@@ -134,16 +136,16 @@ struct OnboardingOptionRow: View {
         ZStack {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(iconBackgroundColor)
-                .frame(width: 56, height: 56)
+                .frame(width: 48, height: 48)
 
             Image(systemName: systemName)
-                .font(.system(size: 24, weight: .semibold))
+                .font(typography.optionIcon)
                 .foregroundStyle(iconGradient)
         }
     }
 
     private var iconGradient: LinearGradient {
-        let start = iconBaseColor.onboardingLighten(by: 0.35)
+        let start = iconBaseColor.designLighten(by: 0.35)
         return LinearGradient(
             gradient: Gradient(colors: [start, iconBaseColor]),
             startPoint: .topLeading,
@@ -156,7 +158,7 @@ struct OnboardingOptionRow: View {
             .fill(
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        accentColor.onboardingLighten(by: 0.6).opacity(isSelected ? 0.08 : 0),
+                        accentColor.designLighten(by: 0.6).opacity(isSelected ? 0.08 : 0),
                         Color.clear
                     ]),
                     startPoint: .topLeading,

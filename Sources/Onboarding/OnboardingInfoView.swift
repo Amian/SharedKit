@@ -1,4 +1,5 @@
 import SwiftUI
+import DesignSystem
 
 @available(iOS 15.0, macOS 12.0, *)
 struct OnboardingInfoView: View {
@@ -6,6 +7,7 @@ struct OnboardingInfoView: View {
     let action: () -> Void
 
     @Environment(\.colorScheme) private var systemScheme
+    @Environment(\.designTypography) private var typography
 
     var body: some View {
         ZStack {
@@ -15,44 +17,43 @@ struct OnboardingInfoView: View {
                 .frame(maxWidth: 480)
                 .padding(.horizontal, 24)
         }
-        .ignoresSafeArea(edges: .bottom)
-            .preferredColorScheme(step.appearance.preferredColorScheme)
+        .preferredColorScheme(step.appearance.preferredColorScheme)
     }
 
     private var content: some View {
-        VStack(spacing: 28) {
-            Spacer(minLength: 16)
+        VStack(spacing: 24) {
+            Spacer(minLength: 12)
 
             if let imageName = step.imageName {
                 Image(imageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: 240, maxHeight: 240)
+                    .frame(maxWidth: 220, maxHeight: 220)
                     .shadow(color: .black.opacity(0.15), radius: 25, x: 0, y: 12)
                     .padding(.bottom, 8)
             }
 
             VStack(spacing: 12) {
                 Text(step.title)
-                    .font(.system(size: 34, weight: .bold))
+                    .font(typography.title)
                     .foregroundColor(titleColor)
                     .multilineTextAlignment(.center)
                     .lineSpacing(6)
 
                 if let subtitle = step.subtitle {
                     Text(subtitle)
-                        .font(.system(size: 16, weight: .regular))
+                        .font(typography.subtitle)
                         .foregroundColor(subtitleColor)
                         .multilineTextAlignment(.center)
                         .lineSpacing(4)
-                        .padding(.horizontal, 32)
+                        .padding(.horizontal, 24)
                 }
             }
 
             Spacer()
 
             primaryButton
-                .padding(.bottom, 32)
+                .padding(.bottom, 24)
         }
     }
 
@@ -71,21 +72,21 @@ struct OnboardingInfoView: View {
     private var primaryButton: some View {
         Button(action: action) {
             Text(step.ctaTitle)
-                .font(.system(size: 16, weight: .semibold))
+                .font(typography.cta)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
-                .frame(height: 56)
+                .frame(height: 52)
                 .background(accentGradient)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .shadow(color: step.accentColor.opacity(0.3), radius: 18, x: 0, y: 10)
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 4)
         }
         .buttonStyle(.plain)
     }
 
     private var accentGradient: LinearGradient {
-        let start = step.accentColor.onboardingLighten(by: 0.12)
-        let end = step.accentColor.onboardingDarken(by: 0.05)
+        let start = step.accentColor.designLighten(by: 0.12)
+        let end = step.accentColor.designDarken(by: 0.05)
         return LinearGradient(
             gradient: Gradient(colors: [start, end]),
             startPoint: .leading,
