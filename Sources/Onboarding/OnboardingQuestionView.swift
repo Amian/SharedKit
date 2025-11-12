@@ -1,7 +1,7 @@
 import SwiftUI
 import DesignSystem
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 struct OnboardingQuestionView: View {
     let step: OnboardingQuestionStep
     @Binding var selections: Set<UUID>

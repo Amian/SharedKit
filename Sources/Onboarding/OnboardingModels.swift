@@ -37,7 +37,7 @@ public struct OnboardingOption: Identifiable, Hashable {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 public struct OnboardingInfoStep: Hashable {
     public var imageName: String?
     public var title: String
@@ -66,7 +66,7 @@ public struct OnboardingInfoStep: Hashable {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 public struct OnboardingQuestionStep: Hashable {
     public var imageName: String?
     public var title: String
@@ -101,13 +101,13 @@ public struct OnboardingQuestionStep: Hashable {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 public enum OnboardingStep: Hashable {
     case info(OnboardingInfoStep)
     case question(OnboardingQuestionStep)
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 public struct OnboardingResponse {
     public let stepIndex: Int
     public let step: OnboardingStep

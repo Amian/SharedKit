@@ -1,6 +1,6 @@
 import SwiftUI
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 public struct DesignTypography: @unchecked Sendable {
     public let title: Font
     public let subtitle: Font
@@ -43,12 +43,12 @@ public struct DesignTypography: @unchecked Sendable {
     )
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 private struct DesignTypographyKey: EnvironmentKey {
     static let defaultValue: DesignTypography = .default
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 public extension EnvironmentValues {
     var designTypography: DesignTypography {
         get { self[DesignTypographyKey.self] }
@@ -56,7 +56,7 @@ public extension EnvironmentValues {
     }
 }
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 public extension View {
     func designTypography(_ typography: DesignTypography) -> some View {
         environment(\.designTypography, typography)

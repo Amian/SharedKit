@@ -2,11 +2,8 @@ import SwiftUI
 #if canImport(UIKit)
 import UIKit
 #endif
-#if canImport(AppKit)
-import AppKit
-#endif
 
-@available(iOS 15.0, macOS 12.0, *)
+@available(iOS 17.0, *)
 public extension Color {
     /// Lightens the current color by blending it with white.
     func designLighten(by amount: CGFloat) -> Color {
@@ -85,8 +82,6 @@ public extension Color {
     static var designSystemBackground: Color {
         #if canImport(UIKit)
         return Color(UIColor.systemBackground)
-        #elseif canImport(AppKit)
-        return Color(NSColor.windowBackgroundColor)
         #else
         return Color.white
         #endif
