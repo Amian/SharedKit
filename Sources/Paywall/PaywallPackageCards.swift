@@ -1,8 +1,11 @@
 import SwiftUI
 import RevenueCat
+import DesignSystem
 
+@available(iOS 17.0, macOS 11.0, *)
 struct CompactPremiumPackageCard: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.designTypography) private var typography
 
     let package: Package
     let isSelected: Bool
@@ -41,7 +44,7 @@ struct CompactPremiumPackageCard: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(package.storeProduct.localizedTitle)
-                            .font(typography.headingLarge)
+                            .font(typography.listTitle)
                             .foregroundColor(primaryTextColor)
 
                         if isPopular {
@@ -57,7 +60,7 @@ struct CompactPremiumPackageCard: View {
 
                     if let savings {
                         Text(savings)
-                            .font(typography.body)
+                            .font(typography.listSubtitle)
                             .foregroundColor(.green)
                     }
 
@@ -130,8 +133,10 @@ struct CompactPremiumPackageCard: View {
     }
 }
 
+@available(iOS 17.0, macOS 11.0, *)
 struct UltraCompactPackageCard: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.designTypography) private var typography
 
     let package: Package
     let isSelected: Bool
@@ -171,9 +176,9 @@ struct UltraCompactPackageCard: View {
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(spacing: 4) {
-                        Text(package.storeProduct.localizedTitle)
-                            .font(isSmallScreen ? typography.headingSmall : typography.headingLarge)
-                            .foregroundColor(primaryTextColor)
+                    Text(package.storeProduct.localizedTitle)
+                        .font(isSmallScreen ? typography.listSubtitle : typography.listTitle)
+                        .foregroundColor(primaryTextColor)
 
                         if isPopular {
                             Text("POPULAR")
@@ -188,7 +193,7 @@ struct UltraCompactPackageCard: View {
 
                     if let savings {
                         Text(savings)
-                            .font(typography.body)
+                            .font(typography.listSubtitle)
                             .foregroundColor(.green)
                     }
 

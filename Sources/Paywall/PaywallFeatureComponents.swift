@@ -1,7 +1,10 @@
 import SwiftUI
+import DesignSystem
 
+@available(iOS 17.0, macOS 11.0, *)
 struct CompactFeatureRow: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.designTypography) private var typography
 
     let feature: PaywallFeature
 
@@ -24,12 +27,12 @@ struct CompactFeatureRow: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(feature.title)
-                    .font(typography.headingLarge)
+                    .font(typography.listTitle)
                     .foregroundColor(titleColor)
 
                 if let subtitle = feature.subtitle, !subtitle.isEmpty {
                     Text(subtitle)
-                        .font(typography.headingSmall)
+                        .font(typography.listSubtitle)
                         .foregroundColor(subtitleColor)
                         .lineLimit(nil)
                         .multilineTextAlignment(.leading)
