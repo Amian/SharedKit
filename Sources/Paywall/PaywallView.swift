@@ -1,11 +1,13 @@
 import SwiftUI
 import RevenueCat
+import DesignSystem
 
-@available(iOS 17.0, macOS 14.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 public struct PaywallView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
     @Environment(\.colorScheme) private var systemColorScheme
+    @Environment(\.designTypography) private var typography
 
     private let configuration: PaywallConfiguration
 
@@ -41,7 +43,7 @@ public struct PaywallView: View {
     private var mutedTextColor: Color {
         resolvedColorScheme == .dark ? Color.white.opacity(0.6) : Color.black.opacity(0.6)
     }
-    private var backgroundColor: Color { Color(UIColor.systemBackground) }
+    private var backgroundColor: Color { Color.designSystemBackground }
     private var surfaceColor: Color {
         resolvedColorScheme == .dark ? Color.white.opacity(0.05) : Color.black.opacity(0.05)
     }
@@ -150,12 +152,12 @@ public struct PaywallView: View {
 
             VStack(spacing: 4) {
                 Text(configuration.headline)
-                    .font(geometry.size.height < 700 ? typography.displayMedium : typography.displayLarge)
+                    .font(geometry.size.height < 700 ? typography.headingLarge : typography.title)
                     .foregroundColor(primaryTextColor)
                     .multilineTextAlignment(.center)
 
                 Text(configuration.subheadline)
-                    .font(typography.displaySubtitle)
+                    .font(typography.subtitle)
                     .foregroundColor(secondaryTextColor)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
