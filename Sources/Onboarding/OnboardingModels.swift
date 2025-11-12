@@ -1,4 +1,10 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
+#if canImport(AppKit)
+import AppKit
+#endif
 
 public enum OnboardingAppearancePreference: Hashable {
     case system
@@ -51,7 +57,7 @@ public struct OnboardingInfoStep: Hashable {
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
         accentColor: Color = Color.green,
-        backgroundColor: Color = Color(UIColor.systemBackground),
+        backgroundColor: Color = .onboardingSystemBackground,
         appearance: OnboardingAppearancePreference = .system
     ) {
         self.imageName = imageName
@@ -83,7 +89,7 @@ public struct OnboardingQuestionStep: Hashable {
         options: [OnboardingOption],
         ctaTitle: String = "Continue",
         accentColor: Color = Color.green,
-        backgroundColor: Color = Color(UIColor.systemBackground),
+        backgroundColor: Color = .onboardingSystemBackground,
         appearance: OnboardingAppearancePreference = .system
     ) {
         self.imageName = imageName
@@ -107,4 +113,16 @@ public struct OnboardingResponse {
     public let stepIndex: Int
     public let step: OnboardingStep
     public let selectedOptionIDs: [UUID]?
+}
+
+public extension Color {
+    static var onboardingSystemBackground: Color {
+        #if canImport(UIKit)
+        return Color(UIColor.systemBackground)
+        #elseif canImport(AppKit)
+        return Color(NSColor.windowBackgroundColor)
+        #else
+        return Color.white
+        #endif
+    }
 }

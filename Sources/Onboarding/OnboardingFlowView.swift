@@ -56,13 +56,28 @@ public struct OnboardingFlowView: View {
     }
 
     private var progressOverlay: some View {
-        HStack {
+        HStack(spacing: 8) {
             ForEach(0..<steps.count, id: \.self) { index in
-                Capsule()
-                    .fill(index <= currentIndex ? Color.primary.opacity(0.8) : Color.primary.opacity(0.15))
+                progressStep(isActive: index <= currentIndex)
                     .frame(height: 4)
+                    .animation(.easeInOut(duration: 0.25), value: currentIndex)
             }
         }
+    }
+
+    private var progressInactiveColor: Color {
+        Color(red: 203/255, green: 213/255, blue: 225/255)
+    }
+
+    private var progressActiveGradient: LinearGradient {
+        let accent = accentColor(for: steps[currentIndex])
+        let start = accent.onboardingLighten(by: 0.15)
+        let end = accent.onboardingDarken(by: 0.05)
+        return LinearGradient(
+            gradient: Gradient(colors: [start, end]),
+            startPoint: .leading,
+            endPoint: .trailing
+        )
     }
 
     private func advance() {
@@ -93,6 +108,24 @@ public struct OnboardingFlowView: View {
             selections[index] ?? []
         } set: { newValue in
             selections[index] = newValue
+        }
+    }
+
+    private func accentColor(for step: OnboardingStep) -> Color {
+        switch step {
+        case .info(let info):
+            return info.accentColor
+        case .question(let question):
+            return question.accentColor
+        }
+    }
+
+    @ViewBuilder
+    private func progressStep(isActive: Bool) -> some View {
+        if isActive {
+            Capsule().fill(progressActiveGradient)
+        } else {
+            Capsule().fill(progressInactiveColor)
         }
     }
 }
