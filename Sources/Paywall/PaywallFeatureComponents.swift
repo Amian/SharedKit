@@ -18,18 +18,18 @@ struct CompactFeatureRow: View {
                     .frame(width: 32, height: 32)
 
                 Image(systemName: feature.icon)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(typography.iconLarge)
                     .foregroundColor(feature.color)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(feature.title)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(typography.headingLarge)
                     .foregroundColor(titleColor)
 
                 if let subtitle = feature.subtitle, !subtitle.isEmpty {
                     Text(subtitle)
-                        .font(.system(size: 13))
+                        .font(typography.headingSmall)
                         .foregroundColor(subtitleColor)
                         .lineLimit(nil)
                         .multilineTextAlignment(.leading)
@@ -39,7 +39,7 @@ struct CompactFeatureRow: View {
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 16, weight: .medium))
+                .font(typography.iconLarge)
                 .foregroundColor(.green)
                 .padding(.top, 4)
         }

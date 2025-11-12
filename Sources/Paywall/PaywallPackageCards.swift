@@ -41,12 +41,12 @@ struct CompactPremiumPackageCard: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(package.storeProduct.localizedTitle)
-                            .font(.system(size: 16, weight: .bold))
+                            .font(typography.headingLarge)
                             .foregroundColor(primaryTextColor)
 
                         if isPopular {
                             Text("POPULAR")
-                                .font(.system(size: 8, weight: .bold))
+                                .font(typography.labelCaps)
                                 .foregroundColor(.black)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
@@ -57,12 +57,12 @@ struct CompactPremiumPackageCard: View {
 
                     if let savings {
                         Text(savings)
-                            .font(.system(size: 12, weight: .medium))
+                            .font(typography.body)
                             .foregroundColor(.green)
                     }
 
                     Text(priceDescription)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(typography.subtitle)
                         .foregroundColor(secondaryTextColor)
                 }
 
@@ -70,12 +70,12 @@ struct CompactPremiumPackageCard: View {
 
                 VStack(alignment: .trailing, spacing: 1) {
                     Text(package.storeProduct.localizedPriceString)
-                        .font(.system(size: 18, weight: .bold))
+                        .font(typography.emphasisPrimary)
                         .foregroundColor(primaryTextColor)
 
                     if package.packageType != .monthly {
                         Text("per year")
-                            .font(.system(size: 10, weight: .medium))
+                            .font(typography.emphasisSecondary)
                             .foregroundColor(secondaryTextColor)
                     }
                 }
@@ -87,7 +87,7 @@ struct CompactPremiumPackageCard: View {
 
                     if isSelected {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(typography.iconSmall)
                             .foregroundColor(.white)
                     }
                 }
@@ -172,12 +172,12 @@ struct UltraCompactPackageCard: View {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack(spacing: 4) {
                         Text(package.storeProduct.localizedTitle)
-                            .font(.system(size: isSmallScreen ? 13 : 14, weight: .bold))
+                            .font(isSmallScreen ? typography.headingSmall : typography.headingLarge)
                             .foregroundColor(primaryTextColor)
 
                         if isPopular {
                             Text("POPULAR")
-                                .font(.system(size: 7, weight: .bold))
+                                .font(typography.labelCaps)
                                 .foregroundColor(.black)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 1)
@@ -188,13 +188,13 @@ struct UltraCompactPackageCard: View {
 
                     if let savings {
                         Text(savings)
-                            .font(.system(size: isSmallScreen ? 10 : 11, weight: .medium))
+                            .font(typography.body)
                             .foregroundColor(.green)
                     }
 
                     if showFreeTrial, package.storeProduct.introductoryDiscount != nil {
                         Text(freeTrialDurationText)
-                            .font(.system(size: isSmallScreen ? 9 : 10, weight: .medium))
+                            .font(typography.subtitle)
                             .foregroundColor(secondaryTextColor)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
@@ -206,16 +206,16 @@ struct UltraCompactPackageCard: View {
                 HStack(spacing: 4) {
                     if package.storeProduct.introductoryDiscount != nil {
                         Text(package.storeProduct.localizedPriceString)
-                            .font(.system(size: isSmallScreen ? 12 : 13, weight: .medium))
+                            .font(typography.emphasisSecondary)
                             .foregroundColor(.gray)
                             .strikethrough()
 
                         Text("Free")
-                            .font(.system(size: isSmallScreen ? 14 : 16, weight: .bold))
+                            .font(typography.emphasisPrimary)
                             .foregroundColor(.green)
                     } else {
                         Text(package.storeProduct.localizedPriceString)
-                            .font(.system(size: isSmallScreen ? 14 : 16, weight: .bold))
+                            .font(typography.emphasisPrimary)
                             .foregroundColor(primaryTextColor)
                     }
                 }
@@ -227,7 +227,7 @@ struct UltraCompactPackageCard: View {
 
                     if isSelected {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 8, weight: .bold))
+                            .font(typography.iconSmall)
                             .foregroundColor(.white)
                     }
                 }

@@ -21,12 +21,12 @@ struct OnboardingOptionRow: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(option.title)
-                    .font(typography.optionTitle)
+                    .font(typography.listTitle)
                     .foregroundColor(titleColor)
 
                 if let subtitle = option.subtitle, !subtitle.isEmpty {
                     Text(subtitle)
-                        .font(typography.optionSubtitle)
+                        .font(typography.listSubtitle)
                         .foregroundColor(subtitleColor)
                         .lineSpacing(2)
                         .fixedSize(horizontal: false, vertical: true)
@@ -125,7 +125,7 @@ struct OnboardingOptionRow: View {
                 )
 
             Image(systemName: "checkmark")
-                .font(typography.optionCheckmark)
+                .font(typography.iconSmall)
                 .foregroundColor(.white)
                 .opacity(isSelected ? 1 : 0)
                 .animation(.easeOut(duration: 0.2), value: isSelected)
@@ -139,7 +139,7 @@ struct OnboardingOptionRow: View {
                 .frame(width: 48, height: 48)
 
             Image(systemName: systemName)
-                .font(typography.optionIcon)
+                .font(typography.iconLarge)
                 .foregroundStyle(iconGradient)
         }
     }

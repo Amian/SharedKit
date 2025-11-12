@@ -139,7 +139,7 @@ struct OnboardingQuestionView: View {
     private var primaryButton: some View {
         Button(action: onAdvance) {
             Text(step.ctaTitle)
-                .font(typography.cta)
+                .font(typography.button)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)

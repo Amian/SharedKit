@@ -13,11 +13,11 @@ struct CompactTrustIndicator: View {
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 12, weight: .medium))
+                .font(typography.iconLarge)
                 .foregroundColor(.green)
 
             Text(text)
-                .font(.system(size: 11, weight: .medium))
+                .font(typography.subtitle)
                 .foregroundColor(textColor)
         }
     }

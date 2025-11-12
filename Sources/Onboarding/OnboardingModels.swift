@@ -1,6 +1,7 @@
 import SwiftUI
 import DesignSystem
 
+@available(iOS 17.0, macOS 11.0, *)
 public enum OnboardingAppearancePreference: Hashable {
     case system
     case light
@@ -15,6 +16,7 @@ public enum OnboardingAppearancePreference: Hashable {
     }
 }
 
+@available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingOption: Identifiable, Hashable {
     public let id: UUID
     public var title: String
@@ -37,7 +39,7 @@ public struct OnboardingOption: Identifiable, Hashable {
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingInfoStep: Hashable {
     public var imageName: String?
     public var title: String
@@ -66,7 +68,7 @@ public struct OnboardingInfoStep: Hashable {
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingQuestionStep: Hashable {
     public var imageName: String?
     public var title: String
@@ -101,13 +103,13 @@ public struct OnboardingQuestionStep: Hashable {
     }
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 public enum OnboardingStep: Hashable {
     case info(OnboardingInfoStep)
     case question(OnboardingQuestionStep)
 }
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingResponse {
     public let stepIndex: Int
     public let step: OnboardingStep

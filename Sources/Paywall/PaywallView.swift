@@ -150,12 +150,12 @@ public struct PaywallView: View {
 
             VStack(spacing: 4) {
                 Text(configuration.headline)
-                    .font(.system(size: geometry.size.height < 700 ? 24 : 28, weight: .bold, design: .rounded))
+                    .font(geometry.size.height < 700 ? typography.displayMedium : typography.displayLarge)
                     .foregroundColor(primaryTextColor)
                     .multilineTextAlignment(.center)
 
                 Text(configuration.subheadline)
-                    .font(.system(size: geometry.size.height < 700 ? 14 : 16, weight: .medium))
+                    .font(typography.displaySubtitle)
                     .foregroundColor(secondaryTextColor)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
@@ -187,7 +187,7 @@ public struct PaywallView: View {
     private func pricingSection(for geometry: GeometryProxy) -> some View {
         VStack(spacing: 12) {
             Text("Choose Your Plan")
-                .font(.system(size: geometry.size.height < 700 ? 16 : 18, weight: .bold))
+                .font(typography.headingLarge)
                 .foregroundColor(primaryTextColor)
                 .opacity(showFeatures ? 1 : 0)
                 .animation(.easeOut(duration: 0.6).delay(0.8), value: showFeatures)
@@ -196,8 +196,8 @@ public struct PaywallView: View {
                 VStack(spacing: 8) {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: accentColor))
-                    Text("Loading options…")
-                        .font(.system(size: 12, weight: .medium))
+                   Text("Loading options…")
+                        .font(typography.subtitle)
                         .foregroundColor(secondaryTextColor)
                 }
                 .padding(.vertical, 16)
@@ -207,7 +207,7 @@ public struct PaywallView: View {
                        weeklyPackage.storeProduct.introductoryDiscount != nil {
                         HStack {
                             Text("Free Trial")
-                                .font(.system(size: geometry.size.height < 700 ? 16 : 18, weight: .bold))
+                                .font(typography.headingLarge)
                                 .foregroundColor(primaryTextColor)
                                 .shadow(color: accentColor.opacity(0.5), radius: 2, x: 0, y: 1)
 
@@ -241,7 +241,7 @@ public struct PaywallView: View {
                 }
             } else {
                 Text("No packages available right now. Please try again later.")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(typography.subtitle)
                     .foregroundColor(secondaryTextColor)
                     .padding(.vertical, 12)
             }
@@ -259,7 +259,7 @@ public struct PaywallView: View {
                 }
 
                 Text(isPurchasing ? "Processing..." : ctaButtonText)
-                    .font(.system(size: geometry.size.height < 700 ? 15 : 16, weight: .bold))
+                    .font(typography.button)
                     .foregroundColor(.white)
             }
             .frame(maxWidth: .infinity)
@@ -301,7 +301,7 @@ public struct PaywallView: View {
 
             Button(action: restorePurchases) {
                 Text("Restore Purchases")
-                    .font(.system(size: 12, weight: .medium))
+                    .font(typography.body)
                     .foregroundColor(secondaryTextColor)
                     .padding(.vertical, 6)
                     .padding(.horizontal, 12)
@@ -318,28 +318,28 @@ public struct PaywallView: View {
                             Button("Privacy Policy") {
                                 openLink(configuration.privacyPolicyURL)
                             }
-                            .font(.system(size: 11, weight: .medium))
+                            .font(typography.subtitle)
                             .foregroundColor(secondaryTextColor)
                         }
 
                         if configuration.privacyPolicyURL != nil && configuration.termsOfServiceURL != nil {
                             Text("•")
                                 .foregroundColor(secondaryTextColor.opacity(0.5))
-                                .font(.system(size: 10))
+                                .font(typography.subtitle)
                         }
 
                         if configuration.termsOfServiceURL != nil {
                             Button("Terms of Service") {
                                 openLink(configuration.termsOfServiceURL)
                             }
-                            .font(.system(size: 11, weight: .medium))
+                            .font(typography.subtitle)
                             .foregroundColor(secondaryTextColor)
                         }
                     }
                 }
 
                 Text("Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.")
-                    .font(.system(size: 9, weight: .regular))
+                    .font(typography.footnote)
                     .foregroundColor(mutedTextColor)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
