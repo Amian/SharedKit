@@ -1,7 +1,7 @@
 import SwiftUI
 import DesignSystem
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 struct OnboardingOptionRow: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.designTypography) private var typography

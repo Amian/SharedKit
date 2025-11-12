@@ -3,7 +3,7 @@ import SwiftUI
 import UIKit
 #endif
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 public extension Color {
     /// Lightens the current color by blending it with white.
     func designLighten(by amount: CGFloat) -> Color {

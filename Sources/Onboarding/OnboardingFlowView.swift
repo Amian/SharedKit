@@ -1,8 +1,9 @@
 import SwiftUI
 import DesignSystem
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingFlowView: View {
+    @Environment(\.colorScheme) private var systemScheme
     let steps: [OnboardingStep]
     let onFinish: (_ responses: [OnboardingResponse]) -> Void
     let onStepChange: ((Int) -> Void)?
@@ -37,6 +38,7 @@ public struct OnboardingFlowView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .animation(.easeInOut, value: currentIndex)
+        .preferredColorScheme(resolvedColorScheme(for: step))
     }
 
     private func contentView(for step: OnboardingStep) -> some View {
@@ -67,7 +69,9 @@ public struct OnboardingFlowView: View {
     }
 
     private var progressInactiveColor: Color {
-        Color(red: 203/255, green: 213/255, blue: 225/255)
+        resolvedColorScheme(for: steps[currentIndex]) == .dark
+            ? Color.white.opacity(0.35)
+            : Color(red: 203/255, green: 213/255, blue: 225/255)
     }
 
     private var progressActiveGradient: LinearGradient {
@@ -127,6 +131,15 @@ public struct OnboardingFlowView: View {
             Capsule().fill(progressActiveGradient)
         } else {
             Capsule().fill(progressInactiveColor)
+        }
+    }
+
+    private func resolvedColorScheme(for step: OnboardingStep) -> ColorScheme {
+        switch step {
+        case .info(let info):
+            return info.appearance.preferredColorScheme ?? systemScheme
+        case .question(let question):
+            return question.appearance.preferredColorScheme ?? systemScheme
         }
     }
 }

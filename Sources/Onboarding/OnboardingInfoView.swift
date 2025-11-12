@@ -1,7 +1,7 @@
 import SwiftUI
 import DesignSystem
 
-@available(iOS 17.0, *)
+@available(iOS 17.0, macOS 11.0, *)
 struct OnboardingInfoView: View {
     let step: OnboardingInfoStep
     let action: () -> Void

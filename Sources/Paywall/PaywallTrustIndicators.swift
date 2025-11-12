@@ -1,7 +1,10 @@
 import SwiftUI
+import DesignSystem
 
+@available(iOS 17.0, macOS 11.0, *)
 struct CompactTrustIndicator: View {
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.designTypography) private var typography
 
     let icon: String
     let text: String
