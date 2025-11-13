@@ -39,6 +39,7 @@ public struct OnboardingFlowView: View {
         }
         .animation(.easeInOut, value: currentIndex)
         .preferredColorScheme(resolvedColorScheme(for: step))
+        .background(backgroundColor(for: step).ignoresSafeArea())
     }
 
     private func contentView(for step: OnboardingStep) -> some View {
@@ -55,6 +56,15 @@ public struct OnboardingFlowView: View {
                     onAdvance: advance
                 )
             }
+        }
+    }
+
+    private func backgroundColor(for step: OnboardingStep) -> Color {
+        switch step {
+        case .info(let info):
+            return info.backgroundColor
+        case .question(let question):
+            return question.backgroundColor
         }
     }
 
