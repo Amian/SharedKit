@@ -12,18 +12,51 @@ public struct AnimatedGIFView: UIViewRepresentable {
         self.resourceName = resourceName
     }
 
-    public func makeUIView(context: Context) -> UIImageView {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .clear
-        imageView.image = UIImage.animatedGIF(named: resourceName)
-        return imageView
+    public func makeCoordinator() -> Coordinator {
+        Coordinator()
     }
 
-    public func updateUIView(_ uiView: UIImageView, context: Context) {
-        // No-op
+    public func makeUIView(context: Context) -> UIView {
+        let container = UIView()
+        container.backgroundColor = .clear
+
+        let imageView = ResizableAnimatedImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
+
+        container.addSubview(imageView)
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: container.topAnchor),
+            imageView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            imageView.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+
+        context.coordinator.imageView = imageView
+        context.coordinator.updateImage(named: resourceName)
+
+        return container
     }
+
+    public func updateUIView(_ uiView: UIView, context: Context) {
+        context.coordinator.updateImage(named: resourceName)
+    }
+
+    public final class Coordinator {
+        fileprivate weak var imageView: UIImageView?
+        private var currentResource: String?
+
+        func updateImage(named name: String) {
+            guard currentResource != name else { return }
+            currentResource = name
+            imageView?.image = UIImage.animatedGIF(named: name)
+        }
+    }
+}
+
+private final class ResizableAnimatedImageView: UIImageView {
+    override var intrinsicContentSize: CGSize { .zero }
 }
 
 private extension UIImage {
