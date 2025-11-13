@@ -37,23 +37,28 @@ struct OnboardingOptionRow: View {
 
             selectionIndicator
         }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 14)
+        .padding(.vertical, 14)
+        .padding(.horizontal, 16)
         .frame(maxWidth: .infinity)
         .background(
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(cardBackgroundColor)
-                .shadow(color: shadowColor.opacity(colorScheme == .dark ? 0.7 : 0.08), radius: isSelected ? 22 : 12, x: 0, y: isSelected ? 12 : 8)
-                .shadow(color: accentColor.opacity(isSelected ? 0.18 : 0), radius: 18, x: 0, y: isSelected ? 8 : 0)
-        )
-        .overlay(selectedOverlay(cornerRadius: cornerRadius))
-        .overlay(
-            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .stroke(isSelected ? accentColor : Color.white.opacity(colorScheme == .dark ? 0.08 : 0), lineWidth: 2)
+                .overlay(
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .stroke(
+                            isSelected ? accentColor : Color.black.opacity(colorScheme == .dark ? 0.15 : 0.05),
+                            lineWidth: 1.5
+                        )
+                )
+                .shadow(
+                    color: Color.black.opacity(colorScheme == .dark ? 0.5 : 0.06),
+                    radius: 20,
+                    x: 0,
+                    y: 10
+                )
         )
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-        .scaleEffect(isSelected ? 1.02 : 1.0)
-        .animation(.spring(response: 0.35, dampingFraction: 0.82), value: isSelected)
+        .overlay(selectedOverlay(cornerRadius: cornerRadius))
     }
 
     private var titleColor: Color {
@@ -158,7 +163,7 @@ struct OnboardingOptionRow: View {
             .fill(
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        accentColor.designLighten(by: 0.6).opacity(isSelected ? 0.08 : 0),
+                        accentColor.designLighten(by: 0.6).opacity(isSelected ? 0.12 : 0.03),
                         Color.clear
                     ]),
                     startPoint: .topLeading,
