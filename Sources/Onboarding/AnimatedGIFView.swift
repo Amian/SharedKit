@@ -9,48 +9,14 @@ struct AnimatedGIFView: UIViewRepresentable {
     func makeUIView(context: Context) -> UIImageView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
         imageView.backgroundColor = .clear
         imageView.image = UIImage.animatedGIF(named: resourceName)
-        applyFadeMask(to: imageView)
         return imageView
     }
 
     func updateUIView(_ uiView: UIImageView, context: Context) {
         // No-op, static animation
-    }
-
-    private func applyFadeMask(to imageView: UIImageView) {
-        let maskLayer = CAGradientLayer()
-        maskLayer.colors = [
-            UIColor.clear.cgColor,
-            UIColor.white.cgColor,
-            UIColor.white.cgColor,
-            UIColor.clear.cgColor
-        ]
-        maskLayer.locations = [0, 0.08, 0.92, 1]
-        maskLayer.startPoint = CGPoint(x: 0.5, y: 0)
-        maskLayer.endPoint = CGPoint(x: 0.5, y: 1)
-
-        let horizontalMask = CAGradientLayer()
-        horizontalMask.colors = [
-            UIColor.clear.cgColor,
-            UIColor.white.cgColor,
-            UIColor.white.cgColor,
-            UIColor.clear.cgColor
-        ]
-        horizontalMask.locations = [0, 0.08, 0.92, 1]
-        horizontalMask.startPoint = CGPoint(x: 0, y: 0.5)
-        horizontalMask.endPoint = CGPoint(x: 1, y: 0.5)
-
-        let combinedLayer = CALayer()
-        combinedLayer.frame = imageView.bounds
-        maskLayer.frame = combinedLayer.bounds
-        horizontalMask.frame = combinedLayer.bounds
-        combinedLayer.addSublayer(maskLayer)
-        combinedLayer.addSublayer(horizontalMask)
-
-        imageView.layer.mask = combinedLayer
-        imageView.layer.masksToBounds = true
     }
 }
 
