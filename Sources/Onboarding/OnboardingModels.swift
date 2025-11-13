@@ -40,23 +40,44 @@ public struct OnboardingOption: Identifiable, Hashable {
 }
 
 @available(iOS 17.0, macOS 11.0, *)
+public enum OnboardingInfoImagePlacement: Hashable {
+    case top
+    case betweenTitleAndSubtitle
+    case bottom
+}
+
+@available(iOS 17.0, macOS 11.0, *)
+public enum OnboardingInfoAccessoryPlacement: Hashable {
+    case aboveImage
+    case afterContentBeforeCTA
+}
+
+@available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingInfoStep: Hashable {
     public var imageName: String?
+    public var gifName: String?
     public var title: String
     public var subtitle: String?
     public var ctaTitle: String
     public var accentColor: Color
     public var backgroundColor: Color
     public var appearance: OnboardingAppearancePreference
+    public var imagePlacement: OnboardingInfoImagePlacement
+    public var accessoryPlacement: OnboardingInfoAccessoryPlacement
+    public var accessory: AnyView?
 
     public init(
         imageName: String? = nil,
+        gifName: String? = nil,
         title: String,
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
         accentColor: Color = Color.green,
         backgroundColor: Color = .designSystemBackground,
-        appearance: OnboardingAppearancePreference = .system
+        appearance: OnboardingAppearancePreference = .system,
+        imagePlacement: OnboardingInfoImagePlacement = .top,
+        accessoryPlacement: OnboardingInfoAccessoryPlacement = .afterContentBeforeCTA,
+        accessory: AnyView? = nil
     ) {
         self.imageName = imageName
         self.title = title
@@ -65,6 +86,62 @@ public struct OnboardingInfoStep: Hashable {
         self.accentColor = accentColor
         self.backgroundColor = backgroundColor
         self.appearance = appearance
+        self.imagePlacement = imagePlacement
+        self.accessoryPlacement = accessoryPlacement
+        self.accessory = accessory
+        self.gifName = gifName
+    }
+
+    public init<Accessory: View>(
+        imageName: String? = nil,
+        gifName: String? = nil,
+        title: String,
+        subtitle: String? = nil,
+        ctaTitle: String = "Continue",
+        accentColor: Color = Color.green,
+        backgroundColor: Color = .designSystemBackground,
+        appearance: OnboardingAppearancePreference = .system,
+        imagePlacement: OnboardingInfoImagePlacement = .top,
+        accessoryPlacement: OnboardingInfoAccessoryPlacement = .afterContentBeforeCTA,
+        @ViewBuilder accessory: () -> Accessory
+    ) {
+        self.init(
+            imageName: imageName,
+            title: title,
+            subtitle: subtitle,
+            ctaTitle: ctaTitle,
+            accentColor: accentColor,
+            backgroundColor: backgroundColor,
+            appearance: appearance,
+            imagePlacement: imagePlacement,
+            accessoryPlacement: accessoryPlacement,
+            gifName: gifName,
+            accessory: AnyView(accessory())
+        )
+    }
+
+    public static func == (lhs: OnboardingInfoStep, rhs: OnboardingInfoStep) -> Bool {
+        lhs.imageName == rhs.imageName &&
+        lhs.gifName == rhs.gifName &&
+        lhs.title == rhs.title &&
+        lhs.subtitle == rhs.subtitle &&
+        lhs.ctaTitle == rhs.ctaTitle &&
+        lhs.accentColor == rhs.accentColor &&
+        lhs.backgroundColor == rhs.backgroundColor &&
+        lhs.appearance == rhs.appearance &&
+        lhs.imagePlacement == rhs.imagePlacement &&
+        lhs.accessoryPlacement == rhs.accessoryPlacement
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(imageName)
+        hasher.combine(title)
+        hasher.combine(subtitle)
+        hasher.combine(ctaTitle)
+        hasher.combine(appearance)
+        hasher.combine(imagePlacement)
+        hasher.combine(accessoryPlacement)
+        hasher.combine(gifName)
     }
 }
 

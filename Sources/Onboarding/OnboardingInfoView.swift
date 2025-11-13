@@ -24,30 +24,10 @@ struct OnboardingInfoView: View {
         VStack(spacing: 24) {
             Spacer(minLength: 12)
 
-            if let imageName = step.imageName {
-                Image(imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: 220, maxHeight: 220)
-                    .shadow(color: .black.opacity(0.15), radius: 25, x: 0, y: 12)
-                    .padding(.bottom, 8)
-            }
+            contentStack
 
-            VStack(spacing: 12) {
-                Text(step.title)
-                    .font(typography.title)
-                    .foregroundColor(titleColor)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(6)
-
-                if let subtitle = step.subtitle {
-                    Text(subtitle)
-                        .font(typography.subtitle)
-                        .foregroundColor(subtitleColor)
-                        .multilineTextAlignment(.center)
-                        .lineSpacing(4)
-                        .padding(.horizontal, 24)
-                }
+            if step.accessoryPlacement == .afterContentBeforeCTA {
+                accessoryView
             }
 
             Spacer()
@@ -119,5 +99,79 @@ struct OnboardingInfoView: View {
             Color(red: 15/255, green: 19/255, blue: 32/255),
             Color(red: 10/255, green: 12/255, blue: 20/255)
         ]
+    }
+
+    @ViewBuilder
+    private var contentStack: some View {
+        VStack(spacing: 12) {
+            if step.accessoryPlacement == .aboveImage {
+                accessoryView
+            }
+
+            switch step.imagePlacement {
+            case .top:
+                imageView
+                textStack
+            case .betweenTitleAndSubtitle:
+                titleView
+                imageView
+                subtitleView
+            case .bottom:
+                textStack
+                imageView
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var textStack: some View {
+        VStack(spacing: 12) {
+            titleView
+            subtitleView
+        }
+    }
+
+    @ViewBuilder
+    private var titleView: some View {
+        Text(step.title)
+            .font(typography.title)
+            .foregroundColor(titleColor)
+            .multilineTextAlignment(.center)
+            .lineSpacing(6)
+    }
+
+    @ViewBuilder
+    private var subtitleView: some View {
+        if let subtitle = step.subtitle {
+            Text(subtitle)
+                .font(typography.subtitle)
+                .foregroundColor(subtitleColor)
+                .multilineTextAlignment(.center)
+                .lineSpacing(4)
+                .padding(.horizontal, 24)
+        }
+    }
+
+    @ViewBuilder
+    private var imageView: some View {
+        if let gifName = step.gifName {
+            AnimatedGIFView(resourceName: gifName)
+                .frame(maxWidth: 220, maxHeight: 220)
+                .padding(.bottom, 8)
+        } else if let imageName = step.imageName {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: 220, maxHeight: 220)
+                .shadow(color: .black.opacity(0.15), radius: 25, x: 0, y: 12)
+                .padding(.bottom, 8)
+        }
+    }
+
+    @ViewBuilder
+    private var accessoryView: some View {
+        if let accessory = step.accessory {
+            accessory
+        }
     }
 }
