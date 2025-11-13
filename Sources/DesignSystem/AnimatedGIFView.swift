@@ -1,12 +1,18 @@
 import SwiftUI
-import UIKit
 import ImageIO
 
-@available(iOS 17.0, macOS 11.0, *)
-struct AnimatedGIFView: UIViewRepresentable {
-    let resourceName: String
+#if canImport(UIKit)
+import UIKit
 
-    func makeUIView(context: Context) -> UIImageView {
+@available(iOS 17.0, *)
+public struct AnimatedGIFView: UIViewRepresentable {
+    public let resourceName: String
+
+    public init(resourceName: String) {
+        self.resourceName = resourceName
+    }
+
+    public func makeUIView(context: Context) -> UIImageView {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
@@ -15,8 +21,8 @@ struct AnimatedGIFView: UIViewRepresentable {
         return imageView
     }
 
-    func updateUIView(_ uiView: UIImageView, context: Context) {
-        // No-op, static animation
+    public func updateUIView(_ uiView: UIImageView, context: Context) {
+        // No-op
     }
 }
 
@@ -68,3 +74,37 @@ private extension UIImage {
         return defaultDuration
     }
 }
+
+#elseif canImport(AppKit)
+import AppKit
+
+@available(macOS 11.0, *)
+public struct AnimatedGIFView: NSViewRepresentable {
+    public let resourceName: String
+
+    public init(resourceName: String) {
+        self.resourceName = resourceName
+    }
+
+    public func makeNSView(context: Context) -> NSImageView {
+        let view = NSImageView()
+        view.imageScaling = .scaleProportionallyUpOrDown
+        view.animates = true
+        view.image = NSImage.animatedGIF(named: resourceName)
+        return view
+    }
+
+    public func updateNSView(_ nsView: NSImageView, context: Context) {}
+}
+
+private extension NSImage {
+    static func animatedGIF(named name: String) -> NSImage? {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "gif"),
+              let data = try? Data(contentsOf: url) else {
+            return nil
+        }
+        return NSImage(data: data)
+    }
+}
+
+#endif

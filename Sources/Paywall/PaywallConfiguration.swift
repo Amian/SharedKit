@@ -26,6 +26,7 @@ public struct PaywallConfiguration: Hashable {
     public var appearance: AppearancePreference
     public var headline: String
     public var subheadline: String
+    public var heroGIFName: String?
 
     public init(
         revenueCatPublicKey: String,
@@ -36,7 +37,8 @@ public struct PaywallConfiguration: Hashable {
         termsOfServiceURL: URL? = nil,
         appearance: AppearancePreference = .system,
         headline: String = "Unlock Premium",
-        subheadline: String = "Track unlimited activities and unlock your full potential"
+        subheadline: String = "Track unlimited activities and unlock your full potential",
+        heroGIFName: String? = nil
     ) {
         self.revenueCatPublicKey = revenueCatPublicKey
         self.offeringIdentifier = offeringIdentifier
@@ -47,5 +49,6 @@ public struct PaywallConfiguration: Hashable {
         self.appearance = appearance
         self.headline = headline
         self.subheadline = subheadline
+        self.heroGIFName = heroGIFName
     }
 }

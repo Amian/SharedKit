@@ -108,47 +108,29 @@ public struct PaywallView: View {
         }
         .padding(.bottom, 20)
     }
-
+    
     private func headerSection(geometry: GeometryProxy) -> some View {
         VStack(spacing: geometry.size.height < 700 ? 8 : 12) {
-                HStack {
-                    Spacer()
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(secondaryTextColor)
-                            .frame(width: 32, height: 32)
-                            .background(chipBackgroundColor)
-                            .clipShape(Circle())
-                    }
+            HStack(alignment: .top) {
+                Color.clear
+                    .frame(width: 32, height: 32)
+                Spacer()
+                    heroVisual(for: geometry.size.height)
+                Spacer()
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(secondaryTextColor)
+                        .frame(width: 32, height: 32)
+                        .background(chipBackgroundColor)
+                        .clipShape(Circle())
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 8)
-                .opacity(showCloseButton ? 1 : 0)
-
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [accentColor.opacity(0.3), accentColor.opacity(0.1)]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: geometry.size.height < 700 ? 80 : 100, height: geometry.size.height < 700 ? 80 : 100)
-
-                Image(systemName: "crown.fill")
-                    .font(.system(size: geometry.size.height < 700 ? 32 : 40, weight: .medium))
-                    .foregroundStyle(
-                        LinearGradient(
-                            gradient: Gradient(colors: [accentColor.opacity(0.7), accentColor]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .scaleEffect(showFeatures ? 1.1 : 1.0)
-                    .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: showFeatures)
             }
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .opacity(showCloseButton ? 1 : 0)
+            
+            
 
             VStack(spacing: 4) {
                 Text(configuration.headline)
@@ -162,6 +144,46 @@ public struct PaywallView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
                     .lineLimit(nil)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func heroVisual(for availableHeight: CGFloat) -> some View {
+        let size: CGFloat = availableHeight < 700 ? 90 : 110
+
+        if let gifName = configuration.heroGIFName {
+            AnimatedGIFView(resourceName: gifName)
+                .frame(width: size, height: size)
+                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(accentColor.opacity(0.25), lineWidth: 1)
+                )
+                .shadow(color: accentColor.opacity(0.2), radius: 20, x: 0, y: 12)
+        } else {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [accentColor.opacity(0.3), accentColor.opacity(0.1)]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: size, height: size)
+
+                Image(systemName: "crown.fill")
+                    .font(.system(size: availableHeight < 700 ? 32 : 40, weight: .medium))
+                    .foregroundStyle(
+                        LinearGradient(
+                            gradient: Gradient(colors: [accentColor.opacity(0.7), accentColor]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .scaleEffect(showFeatures ? 1.1 : 1.0)
+                    .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: showFeatures)
             }
         }
     }
