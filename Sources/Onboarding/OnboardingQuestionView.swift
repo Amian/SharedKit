@@ -75,30 +75,8 @@ struct OnboardingQuestionView: View {
     }
 
     private var backgroundView: some View {
-        ZStack {
-            LinearGradient(
-                colors: resolvedScheme == .dark ? darkBackgroundColors : lightBackgroundColors,
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-
-            step.backgroundColor.opacity(0.15)
-        }
-        .ignoresSafeArea()
-    }
-
-    private var lightBackgroundColors: [Color] {
-        [
-            Color(red: 248/255, green: 250/255, blue: 252/255),
-            Color(red: 226/255, green: 232/255, blue: 240/255)
-        ]
-    }
-
-    private var darkBackgroundColors: [Color] {
-        [
-            Color(red: 15/255, green: 19/255, blue: 32/255),
-            Color(red: 10/255, green: 12/255, blue: 20/255)
-        ]
+        step.backgroundColor
+            .ignoresSafeArea()
     }
 
     private var header: some View {

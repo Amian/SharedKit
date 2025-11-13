@@ -75,16 +75,8 @@ struct OnboardingInfoView: View {
     }
 
     private var backgroundView: some View {
-        ZStack {
-            LinearGradient(
-                colors: resolvedScheme == .dark ? darkBackgroundColors : lightBackgroundColors,
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-
-            step.backgroundColor.opacity(0.15)
-        }
-        .ignoresSafeArea()
+        step.backgroundColor
+            .ignoresSafeArea()
     }
 
     private var lightBackgroundColors: [Color] {
@@ -156,7 +148,7 @@ struct OnboardingInfoView: View {
     private var imageView: some View {
         if let gifName = step.gifName {
             AnimatedGIFView(resourceName: gifName)
-                .frame(maxWidth: 220, maxHeight: 220)
+//                .frame(maxWidth: 220, maxHeight: 220)
                 .padding(.vertical, 12)
         } else if let imageName = step.imageName {
             Image(imageName)
