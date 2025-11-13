@@ -155,12 +155,12 @@ public struct PaywallView: View {
         if let gifName = configuration.heroGIFName {
             AnimatedGIFView(resourceName: gifName)
                 .frame(width: size, height: size)
-                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        .stroke(accentColor.opacity(0.25), lineWidth: 1)
-                )
-                .shadow(color: accentColor.opacity(0.2), radius: 20, x: 0, y: 12)
+//                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+//                .overlay(
+//                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+//                        .stroke(accentColor.opacity(0.25), lineWidth: 1)
+//                )
+//                .shadow(color: accentColor.opacity(0.2), radius: 20, x: 0, y: 12)
         } else {
             ZStack {
                 Circle()
