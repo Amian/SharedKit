@@ -70,7 +70,9 @@ struct OnboardingOptionRow: View {
     }
 
     private var cardBackgroundColor: Color {
-        colorScheme == .dark ? Color(red: 19/255, green: 23/255, blue: 34/255) : .white
+        colorScheme == .dark
+            ? Color(red: 19/255, green: 23/255, blue: 34/255)
+            : Color(red: 250/255, green: 247/255, blue: 242/255)
     }
 
     private var shadowColor: Color {
