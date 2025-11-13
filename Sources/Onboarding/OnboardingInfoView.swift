@@ -155,7 +155,7 @@ struct OnboardingInfoView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: 220, maxHeight: 220)
-                .shadow(color: .black.opacity(0.15), radius: 25, x: 0, y: 12)
+//                .shadow(color: .black.opacity(0.15), radius: 25, x: 0, y: 12)
                 .padding(.vertical, 12)
         }
     }
