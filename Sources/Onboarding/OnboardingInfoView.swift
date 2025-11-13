@@ -103,7 +103,7 @@ struct OnboardingInfoView: View {
 
     @ViewBuilder
     private var contentStack: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 16) {
             if step.accessoryPlacement == .aboveImage {
                 accessoryView
             }
@@ -157,14 +157,14 @@ struct OnboardingInfoView: View {
         if let gifName = step.gifName {
             AnimatedGIFView(resourceName: gifName)
                 .frame(maxWidth: 220, maxHeight: 220)
-                .padding(.bottom, 8)
+                .padding(.vertical, 12)
         } else if let imageName = step.imageName {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
                 .frame(maxWidth: 220, maxHeight: 220)
                 .shadow(color: .black.opacity(0.15), radius: 25, x: 0, y: 12)
-                .padding(.bottom, 8)
+                .padding(.vertical, 12)
         }
     }
 

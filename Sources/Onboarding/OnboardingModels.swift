@@ -107,7 +107,7 @@ public struct OnboardingInfoStep: Hashable {
     ) {
         self.init(
             imageName: imageName,
-            title: title,
+            gifName: gifName, title: title,
             subtitle: subtitle,
             ctaTitle: ctaTitle,
             accentColor: accentColor,
@@ -115,7 +115,6 @@ public struct OnboardingInfoStep: Hashable {
             appearance: appearance,
             imagePlacement: imagePlacement,
             accessoryPlacement: accessoryPlacement,
-            gifName: gifName,
             accessory: AnyView(accessory())
         )
     }
