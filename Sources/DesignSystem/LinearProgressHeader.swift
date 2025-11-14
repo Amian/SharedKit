@@ -5,12 +5,14 @@ public struct LinearProgressHeader: View {
     private let leadingText: String
     private let progress: Double
     private let accentGradient: LinearGradient
+    private let percentColor: Color
     private let formatter: NumberFormatter
 
     public init(
         leadingText: String,
         progress: Double,
-        accentColors: [Color] = [Color.purple, Color.blue]
+        accentColors: [Color] = [Color.purple, Color.blue],
+        percentColor: Color = Color.purple
     ) {
         self.leadingText = leadingText
         self.progress = min(max(progress, 0), 1)
@@ -19,6 +21,7 @@ public struct LinearProgressHeader: View {
             startPoint: .leading,
             endPoint: .trailing
         )
+        self.percentColor = percentColor
 
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .percent
@@ -30,14 +33,14 @@ public struct LinearProgressHeader: View {
         VStack(spacing: 10) {
             HStack {
                 Text(leadingText)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundColor(Color.primary.opacity(0.8))
 
                 Spacer()
 
                 Text(percentText)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color.purple)
+                    .foregroundColor(percentColor)
             }
 
             GeometryReader { geometry in
