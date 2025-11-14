@@ -35,6 +35,7 @@ public struct LinearProgressHeader: View {
                 Text(leadingText)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(Color.primary.opacity(0.8))
+                Spacer()
             }
 
             GeometryReader { geometry in
