@@ -21,7 +21,7 @@ struct CompactFeatureRow: View {
                     .frame(width: 32, height: 32)
 
                 Image(systemName: feature.icon)
-                    .font(typography.iconLarge)
+                    .font(typography.iconSmall)
                     .foregroundColor(feature.color)
             }
 
