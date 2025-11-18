@@ -38,6 +38,29 @@ struct CompactPremiumPackageCard: View {
         }
     }
 
+    private var defaultSubtitle: String {
+        switch package.packageType {
+        case .monthly:
+            return "Billed monthly"
+        case .annual:
+            return "Billed annually"
+        case .sixMonth:
+            return "Billed every 6 months"
+        case .threeMonth:
+            return "Billed quarterly"
+        case .twoMonth:
+            return "Billed every 2 months"
+        case .weekly:
+            return "Billed weekly"
+        case .lifetime:
+            return "One-time purchase"
+        case .custom:
+            return "Special offer"
+        case .unknown:
+            return "Limited time offer"
+        }
+    }
+
     var body: some View {
         Button(action: onSelect) {
             HStack(spacing: 12) {
@@ -171,6 +194,29 @@ struct UltraCompactPackageCard: View {
         }
     }
 
+    private var defaultSubtitle: String {
+        switch package.packageType {
+        case .monthly:
+            return "Billed monthly"
+        case .annual:
+            return "Billed annually"
+        case .sixMonth:
+            return "Billed every 6 months"
+        case .threeMonth:
+            return "Billed quarterly"
+        case .twoMonth:
+            return "Billed every 2 months"
+        case .weekly:
+            return "Billed weekly"
+        case .lifetime:
+            return "One-time purchase"
+        case .custom:
+            return "Special offer"
+        case .unknown:
+            return "Limited time offer"
+        }
+    }
+
     var body: some View {
         Button(action: onSelect) {
             HStack(spacing: 8) {
@@ -203,6 +249,12 @@ struct UltraCompactPackageCard: View {
                             .foregroundColor(secondaryTextColor)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
+                    } else {
+                        Text(defaultSubtitle)
+                            .font(typography.subtitle)
+                            .foregroundColor(secondaryTextColor)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
                     }
                 }
 
@@ -215,7 +267,7 @@ struct UltraCompactPackageCard: View {
                             .foregroundColor(.gray)
                             .strikethrough()
 
-                        Text("Free")
+                        Text("FREE")
                             .font(typography.emphasisPrimary)
                             .foregroundColor(.green)
                     } else {

@@ -24,7 +24,8 @@ public final class SubscriptionManager: NSObject, ObservableObject {
         guard !isConfigured else { return }
 
         guard !configuration.revenueCatPublicKey.isEmpty else {
-            refreshFromStorage()
+            // Without a key we cannot validate entitlements; default to non-premium.
+            persistPremium(false)
             isConfigured = true
             return
         }
@@ -39,11 +40,6 @@ public final class SubscriptionManager: NSObject, ObservableObject {
         isConfigured = true
     }
 
-    /// Reads the persisted premium state from UserDefaults.
-    public func refreshFromStorage() {
-        isPremium = UserDefaults.standard.bool(forKey: storageKey)
-    }
-
     /// Persists the premium flag in UserDefaults.
     public func persistPremium(_ enabled: Bool) {
         UserDefaults.standard.set(enabled, forKey: storageKey)
@@ -55,7 +51,8 @@ public final class SubscriptionManager: NSObject, ObservableObject {
             let info = try await Purchases.shared.customerInfo()
             updatePremiumStatus(from: info)
         } catch {
-            refreshFromStorage()
+            // If we cannot validate, default to non-premium to avoid granting access incorrectly.
+            persistPremium(false)
         }
     }
 

@@ -10,6 +10,7 @@ public struct PaywallView: View {
     @Environment(\.designTypography) private var typography
 
     private let configuration: PaywallConfiguration
+    private let shouldLoadOfferingFromNetwork: Bool
 
     @State private var alertMessage: String?
     @State private var isLoading = true
@@ -20,16 +21,28 @@ public struct PaywallView: View {
     @State private var showFreeTrial = false
     @State private var showCloseButton = false
     @StateObject private var subscriptionManager = SubscriptionManager.shared
+    
+    public init(configuration: PaywallConfiguration? = nil, previewOffering: Offering? = nil) {
+        let resolvedConfiguration: PaywallConfiguration
 
-    public init(configuration: PaywallConfiguration? = nil) {
         if let configuration {
-            self.configuration = configuration
+            resolvedConfiguration = configuration
             SubscriptionManager.shared.configure(with: configuration)
         } else if let shared = Paywall.configuration {
-            self.configuration = shared
+            resolvedConfiguration = shared
         } else {
             fatalError("PaywallView requires a configuration. Call Paywall.configure(with:) during app launch or pass one to PaywallView(configuration:).")
         }
+
+        self.configuration = resolvedConfiguration
+        let shouldLoad = previewOffering == nil && !resolvedConfiguration.revenueCatPublicKey.isEmpty
+        self.shouldLoadOfferingFromNetwork = shouldLoad
+
+        let initialSelection = PaywallView.initialSelection(from: previewOffering)
+        self._offering = State(initialValue: previewOffering)
+        self._selectedPackage = State(initialValue: initialSelection.selected)
+        self._showFreeTrial = State(initialValue: initialSelection.showFreeTrial)
+        self._isLoading = State(initialValue: shouldLoad)
     }
 
     private var accentColor: Color { configuration.accentColor }
@@ -67,7 +80,10 @@ public struct PaywallView: View {
                 .scrollIndicators(.hidden)
             }
         }
-        .task { await loadOffering() }
+        .task {
+            guard shouldLoadOfferingFromNetwork else { return }
+            await loadOffering()
+        }
         .onAppear(perform: startAnimations)
         .onReceive(subscriptionManager.$isPremium, perform: handlePremiumChange(_:))
         .alert("Message", isPresented: .constant(alertMessage != nil)) {
@@ -227,35 +243,36 @@ public struct PaywallView: View {
                 .padding(.vertical, 16)
             } else if let offering {
                 VStack(spacing: 8) {
-                    if let weeklyPackage = offering.availablePackages.first(where: { $0.packageType == .weekly }),
-                       weeklyPackage.storeProduct.introductoryDiscount != nil {
-                        HStack {
-                            Text("Free Trial")
-                                .font(typography.headingLarge)
-                                .foregroundColor(primaryTextColor)
-                                .shadow(color: accentColor.opacity(0.5), radius: 2, x: 0, y: 1)
+            if let freeTrialPackage = PaywallView.freeTrialPackage(from: offering) {
+                HStack {
+                    Text("Free Trial")
+                        .font(typography.headingLarge)
+                        .foregroundColor(primaryTextColor)
 
-                            Spacer()
-
-                            Toggle("", isOn: $showFreeTrial)
-                                .toggleStyle(SwitchToggleStyle(tint: accentColor))
-                                .scaleEffect(0.8)
-                                .onChange(of: showFreeTrial) { _, newValue in
-                                    handleFreeTrialToggle(newValue: newValue)
-                                }
+                    Spacer()
+                    
+                    Toggle("", isOn: $showFreeTrial)
+                        .labelsHidden()
+                        .toggleStyle(SwitchToggleStyle(tint: accentColor))
+                        .scaleEffect(0.8)
+                        .frame(width: 44, alignment: .trailing)
+                        .onChange(of: showFreeTrial) { _, newValue in
+                            handleFreeTrialToggle(newValue: newValue)
                         }
-                        .opacity(showFeatures ? 1 : 0)
-                        .animation(.easeOut(duration: 0.6).delay(0.9), value: showFeatures)
                     }
+                    .opacity(showFeatures ? 1 : 0)
+                    .animation(.easeOut(duration: 0.6).delay(0.9), value: showFeatures)
+                    .padding(.vertical, 7)
+                }
 
-                    let packages = offering.availablePackages.sorted(by: { $0.packageType.rawValue > $1.packageType.rawValue })
-                    ForEach(packages, id: \.identifier) { package in
-                        UltraCompactPackageCard(
+                let packages = offering.availablePackages.sorted(by: { $0.packageType.rawValue > $1.packageType.rawValue })
+                ForEach(packages, id: \.identifier) { package in
+                    UltraCompactPackageCard(
                             package: package,
                             isSelected: selectedPackage?.identifier == package.identifier,
                             onSelect: { selectedPackage = package },
                             isSmallScreen: geometry.size.height < 700,
-                            showFreeTrial: showFreeTrial && package.packageType == .weekly,
+                            showFreeTrial: package.storeProduct.introductoryDiscount != nil,
                             accentColor: accentColor
                         )
                         .opacity(showFeatures ? 1 : 0)
@@ -323,51 +340,42 @@ public struct PaywallView: View {
             .opacity(showFeatures ? 1 : 0)
             .animation(.easeOut(duration: 0.6).delay(1.4), value: showFeatures)
 
-            Button(action: restorePurchases) {
-                Text("Restore Purchases")
-                    .font(typography.body)
-                    .foregroundColor(secondaryTextColor)
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 12)
-                    .background(surfaceColor)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-            .opacity(showFeatures ? 1 : 0)
-            .animation(.easeOut(duration: 0.6).delay(1.6), value: showFeatures)
-
             VStack(spacing: 6) {
                 if configuration.privacyPolicyURL != nil || configuration.termsOfServiceURL != nil {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 8) {
                         if configuration.privacyPolicyURL != nil {
                             Button("Privacy Policy") {
                                 openLink(configuration.privacyPolicyURL)
                             }
-                            .font(typography.subtitle)
+                            .font(typography.footnote)
                             .foregroundColor(secondaryTextColor)
+                            .underline(true)
                         }
-
-                        if configuration.privacyPolicyURL != nil && configuration.termsOfServiceURL != nil {
-                            Text("•")
-                                .foregroundColor(secondaryTextColor.opacity(0.5))
-                                .font(typography.subtitle)
+                        
+                        Button("Restore Purchases") {
+                            restorePurchases()
                         }
+                        .font(typography.footnote)
+                        .foregroundColor(secondaryTextColor)
+                        .underline(true)
 
                         if configuration.termsOfServiceURL != nil {
                             Button("Terms of Service") {
                                 openLink(configuration.termsOfServiceURL)
                             }
-                            .font(typography.subtitle)
+                            .font(typography.footnote)
                             .foregroundColor(secondaryTextColor)
+                            .underline(true)
                         }
                     }
                 }
 
-                Text("Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.")
-                    .font(typography.footnote)
-                    .foregroundColor(mutedTextColor)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .lineLimit(geometry.size.height < 700 ? 4 : 3)
+//                Text("Subscription automatically renews unless auto-renew is turned off at least 24 hours before the end of the current period.")
+//                    .font(typography.footnote)
+//                    .foregroundColor(mutedTextColor)
+//                    .multilineTextAlignment(.center)
+//                    .padding(.horizontal, 24)
+//                    .lineLimit(geometry.size.height < 700 ? 4 : 3)
             }
             .opacity(showFeatures ? 1 : 0)
             .animation(.easeOut(duration: 0.6).delay(1.8), value: showFeatures)
@@ -378,8 +386,7 @@ public struct PaywallView: View {
 
     private var ctaButtonText: String {
         guard let selectedPackage else { return "Unlock Premium" }
-        if showFreeTrial && selectedPackage.packageType == .weekly,
-           selectedPackage.storeProduct.introductoryDiscount != nil {
+        if showFreeTrial && selectedPackage.storeProduct.introductoryDiscount != nil {
             return "Start Free Trial"
         }
         return "Unlock Premium"
@@ -417,17 +424,9 @@ public struct PaywallView: View {
 
     @MainActor
     private func selectInitialPackage(from offering: Offering) {
-        let weekly = offering.availablePackages.first(where: { $0.packageType == .weekly })
-        let hasFreeTrial = weekly?.storeProduct.introductoryDiscount != nil
-        showFreeTrial = hasFreeTrial
-
-        if hasFreeTrial, let weekly {
-            selectedPackage = weekly
-        } else if let preferred = offering.availablePackages.first(where: { $0.packageType != .weekly }) {
-            selectedPackage = preferred
-        } else {
-            selectedPackage = offering.availablePackages.first
-        }
+        let initialSelection = PaywallView.initialSelection(from: offering)
+        showFreeTrial = initialSelection.showFreeTrial
+        selectedPackage = initialSelection.selected
     }
 
     @MainActor
@@ -435,18 +434,15 @@ public struct PaywallView: View {
         guard let offering else { return }
 
         if newValue {
-            if let weekly = offering.availablePackages.first(where: { $0.packageType == .weekly }) {
-                selectedPackage = weekly
-            }
-        } else if let nonWeekly = offering.availablePackages.first(where: { $0.packageType != .weekly }) {
-            selectedPackage = nonWeekly
+            selectedPackage = PaywallView.freeTrialPackage(from: offering) ?? offering.availablePackages.first
         } else {
-            selectedPackage = offering.availablePackages.first
+            selectedPackage = PaywallView.preferredNonTrialPackage(from: offering)
         }
     }
 
     @MainActor
     private func purchaseSelectedPackage() {
+        guard shouldLoadOfferingFromNetwork else { return }
         guard let package = selectedPackage else { return }
         Task {
             await purchase(package: package)
@@ -472,6 +468,7 @@ public struct PaywallView: View {
 
     @MainActor
     private func restorePurchases() {
+        guard shouldLoadOfferingFromNetwork else { return }
         Task {
             do {
                 let customerInfo = try await Purchases.shared.restorePurchases()
@@ -493,5 +490,34 @@ public struct PaywallView: View {
     private func openLink(_ url: URL?) {
         guard let url else { return }
         openURL(url)
+    }
+
+    private static func initialSelection(from offering: Offering?) -> (selected: Package?, showFreeTrial: Bool) {
+        guard let offering else { return (nil, false) }
+
+        if let freeTrial = freeTrialPackage(from: offering) {
+            return (freeTrial, true)
+        }
+
+        if let preferred = offering.availablePackages.first(where: { $0.packageType != .weekly }) {
+            return (preferred, false)
+        }
+
+        return (offering.availablePackages.first, false)
+    }
+
+    private static func freeTrialPackage(from offering: Offering) -> Package? {
+        if let weeklyTrial = offering.availablePackages.first(where: { $0.packageType == .weekly && $0.storeProduct.introductoryDiscount != nil }) {
+            return weeklyTrial
+        }
+        return offering.availablePackages.first(where: { $0.storeProduct.introductoryDiscount != nil })
+    }
+
+    private static func preferredNonTrialPackage(from offering: Offering) -> Package? {
+        let nonTrialPackages = offering.availablePackages.filter { $0.storeProduct.introductoryDiscount == nil }
+        if let preferred = nonTrialPackages.first(where: { $0.packageType != .weekly }) {
+            return preferred
+        }
+        return nonTrialPackages.first ?? offering.availablePackages.first
     }
 }
