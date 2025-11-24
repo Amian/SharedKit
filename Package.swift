@@ -14,6 +14,10 @@ let package = Package(
             targets: ["DesignSystem"]
         ),
         .library(
+            name: "FirebaseKit",
+            targets: ["FirebaseKit"]
+        ),
+        .library(
             name: "Paywall",
             targets: ["Paywall"]
         ),
@@ -27,10 +31,23 @@ let package = Package(
             url: "https://github.com/RevenueCat/purchases-ios.git",
             from: "4.33.0"
         ),
+        .package(
+            url: "https://github.com/firebase/firebase-ios-sdk.git",
+            from: "11.2.0"
+        ),
     ],
     targets: [
         .target(
             name: "DesignSystem"
+        ),
+        .target(
+            name: "FirebaseKit",
+            dependencies: [
+                .product(name: "FirebaseAnalytics", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseCrashlytics", package: "firebase-ios-sdk"),
+                .product(name: "FirebaseRemoteConfig", package: "firebase-ios-sdk"),
+            ]
         ),
         .target(
             name: "Paywall",

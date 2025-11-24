@@ -1,7 +1,8 @@
 # SharedUIKit Paywall
 
-`SharedUIKit` is a Swift Package that currently exposes two SwiftUI modules:
+`SharedUIKit` is a Swift Package that currently exposes three modules:
 
+- `FirebaseKit`: thin wrapper around Firebase (Core, Analytics, Crashlytics, RemoteConfig) with a single configure entry point and protocol-based clients.
 - `Paywall`: RevenueCat-driven subscription paywall plus entitlement manager.
 - `Onboarding`: simple, configurable welcome screen you can reuse across apps.
 
@@ -21,12 +22,43 @@ targets: [
     .target(
         name: "MyApp",
         dependencies: [
+            .product(name: "FirebaseKit", package: "SharedUIKit"),
             .product(name: "Paywall", package: "SharedUIKit"),
             .product(name: "Onboarding", package: "SharedUIKit")
         ]
     )
 ]
 ```
+
+## FirebaseKit Setup
+
+- Keep `GoogleService-Info.plist`, the Crashlytics run script, and any per-app Firebase config in each host app target.
+- Firebase is not auto-configured; call `FirebaseKit.configure()` once during app launch before using any clients.
+
+```swift
+import FirebaseKit
+
+@main
+struct MyApp: App {
+    init() {
+        FirebaseKit.configure()
+    }
+
+    var body: some Scene { ... }
+}
+```
+
+Default clients are provided:
+
+```swift
+FirebaseKit.analytics.logEvent("opened_paywall", parameters: ["source": "home"])
+FirebaseKit.crashReporter.log("Reached paywall screen")
+FirebaseKit.remoteConfig.fetchAndActivate { result in
+    // use FirebaseKit.remoteConfig.bool(forKey: "newPaywallEnabled")
+}
+```
+
+If you prefer dependency injection, depend on the protocols `AnalyticsClient`, `CrashReporter`, and `RemoteConfigClient` and pass in the Firebase-backed instances above.
 
 ## 2. Create a Configuration
 
