@@ -64,16 +64,7 @@ public final class AppBrowserRepository: ObservableObject {
     }
 
     private func decodeApps(from data: Data) throws -> [AppListing] {
-        let decoder = JSONDecoder()
-        if let payload = try? decoder.decode(AppListPayload.self, from: data) {
-            if let apps = payload.apps {
-                return apps
-            }
-            if let subjects = payload.subjects {
-                return subjects
-            }
-        }
-        return try decoder.decode([AppListing].self, from: data)
+        try JSONDecoder().decode([AppListing].self, from: data)
     }
 
     private static func makeCacheURL(for sourceURL: URL) -> URL {
@@ -86,9 +77,4 @@ public final class AppBrowserRepository: ObservableObject {
         let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_"))
         return url.absoluteString.unicodeScalars.map { allowed.contains($0) ? String($0) : "_" }.joined()
     }
-}
-
-private struct AppListPayload: Codable {
-    let apps: [AppListing]?
-    let subjects: [AppListing]?
 }
