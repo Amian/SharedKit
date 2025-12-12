@@ -61,11 +61,18 @@ public struct AppListing: Codable, Identifiable, Hashable {
 
     public func imageURL(using imageBaseURL: URL?) -> URL? {
         if let imageUrl, !imageUrl.isEmpty, let url = URL(string: imageUrl) {
+#if DEBUG
+            print("AppListing: using explicit imageUrl \(url.absoluteString) for \(app)")
+#endif
             return url
         }
 
         guard let imageBaseURL else { return nil }
-        return imageBaseURL.appendingPathComponent("\(app).png")
+        let fallback = imageBaseURL.appendingPathComponent("\(app).png")
+#if DEBUG
+        print("AppListing: using fallback imageUrl \(fallback.absoluteString) for \(app)")
+#endif
+        return fallback
     }
 
     public var destinationURL: URL? {

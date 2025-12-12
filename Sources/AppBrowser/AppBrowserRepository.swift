@@ -37,8 +37,14 @@ public final class AppBrowserRepository: ObservableObject {
     private func loadCached() async {
         guard FileManager.default.fileExists(atPath: cacheURL.path) else { return }
         do {
+#if DEBUG
+            print("AppBrowserRepository: loading cache from \(cacheURL.path)")
+#endif
             let data = try Data(contentsOf: cacheURL)
             let decoded = try decodeApps(from: data)
+#if DEBUG
+            print("AppBrowserRepository: cache load succeeded (\(decoded.count) items)")
+#endif
             apps = filtered(decoded)
         } catch {
             print("AppBrowserRepository: cache load failed \(error)")
@@ -47,10 +53,16 @@ public final class AppBrowserRepository: ObservableObject {
 
     private func fetchRemote() async {
         do {
+#if DEBUG
+            print("AppBrowserRepository: fetching from \(sourceURL.absoluteString)")
+#endif
             let (data, _) = try await urlSession.data(from: sourceURL)
             let decoded = try decodeApps(from: data)
             let filteredApps = filtered(decoded)
             apps = filteredApps
+#if DEBUG
+            print("AppBrowserRepository: fetch succeeded (\(filteredApps.count) items)")
+#endif
             try? data.write(to: cacheURL, options: .atomic)
         } catch {
             print("AppBrowserRepository: fetch failed \(error)")
