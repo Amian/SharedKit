@@ -125,7 +125,7 @@ private struct AppCard: View {
                 .cornerRadius(configuration.cornerRadius)
 
                 LinearGradient(
-                    colors: [Color.black.opacity(0.6), Color.black.opacity(0.05)],
+                    colors: [Color.black.opacity(0.8), Color.black.opacity(0.7), Color.black.opacity(0.6), Color.black.opacity(0.4), Color.black.opacity(0.05), Color.clear],
                     startPoint: .bottom,
                     endPoint: .top
                 )
