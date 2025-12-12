@@ -22,6 +22,7 @@ The source URL must return a JSON array of listings:
 - `subject` is the identifier (also accepted as `app`, `slug`, or `id`).
 - `name` is required; if omitted the identifier is used for display.
 - Optional keys: `appleId`, `imageUrl`, `link` (also accepts `appStoreId`, `image_url`, `url`).
+- If `imageUrl` is missing or empty, `AppListing.imageURL(using:)` falls back to `imageBaseURL/<app>.png`.
 
 ## Quick start (SwiftUI)
 ```swift

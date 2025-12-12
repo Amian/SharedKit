@@ -60,7 +60,7 @@ public struct AppListing: Codable, Identifiable, Hashable {
     }
 
     public func imageURL(using imageBaseURL: URL?) -> URL? {
-        if let imageUrl, let url = URL(string: imageUrl) {
+        if let imageUrl, !imageUrl.isEmpty, let url = URL(string: imageUrl) {
             return url
         }
 
