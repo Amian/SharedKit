@@ -37,7 +37,7 @@ public struct PaywallConfiguration: Hashable {
         termsOfServiceURL: URL? = nil,
         appearance: AppearancePreference = .system,
         headline: String = "Unlock Premium",
-        subheadline: String = "Track unlimited activities and unlock your full potential",
+        subheadline: String = "Unlock your full potential with complete access",
         heroGIFName: String? = nil
     ) {
         self.revenueCatPublicKey = revenueCatPublicKey

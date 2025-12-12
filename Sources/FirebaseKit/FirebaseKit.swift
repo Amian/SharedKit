@@ -4,12 +4,14 @@ import FirebaseCore
 import FirebaseCrashlytics
 import FirebaseRemoteConfig
 
+@MainActor
 public protocol AnalyticsClient {
     func logEvent(_ name: String, parameters: [String: Any]?)
     func setUserID(_ id: String?)
     func setUserProperty(_ value: String?, forName name: String)
 }
 
+@MainActor
 public protocol CrashReporter {
     func log(_ message: String)
     func record(error: Error)
@@ -17,6 +19,7 @@ public protocol CrashReporter {
     func setCustomValue(_ value: Any?, forKey key: String)
 }
 
+@MainActor
 public protocol RemoteConfigClient {
     func fetchAndActivate(completion: @escaping (Result<Void, Error>) -> Void)
     func string(forKey key: String) -> String?
@@ -25,10 +28,11 @@ public protocol RemoteConfigClient {
     func data(forKey key: String) -> Data
 }
 
+@MainActor
 public enum FirebaseKit {
-    public static var analytics: AnalyticsClient = FirebaseAnalyticsClient()
-    public static var crashReporter: CrashReporter = FirebaseCrashlyticsClient()
-    public static var remoteConfig: RemoteConfigClient = FirebaseRemoteConfigClient()
+    public static let analytics: AnalyticsClient = FirebaseAnalyticsClient()
+    public static let crashReporter: CrashReporter = FirebaseCrashlyticsClient()
+    public static let remoteConfig: RemoteConfigClient = FirebaseRemoteConfigClient()
 
     private static var isConfigured = false
 
@@ -49,6 +53,7 @@ public enum FirebaseKitError: Error {
     case notConfigured
 }
 
+@MainActor
 final class FirebaseAnalyticsClient: AnalyticsClient {
     func logEvent(_ name: String, parameters: [String: Any]?) {
         FirebaseKit.assertConfigured()
@@ -66,6 +71,7 @@ final class FirebaseAnalyticsClient: AnalyticsClient {
     }
 }
 
+@MainActor
 final class FirebaseCrashlyticsClient: CrashReporter {
     func log(_ message: String) {
         FirebaseKit.assertConfigured()
@@ -88,6 +94,7 @@ final class FirebaseCrashlyticsClient: CrashReporter {
     }
 }
 
+@MainActor
 final class FirebaseRemoteConfigClient: RemoteConfigClient {
     private lazy var remoteConfig: RemoteConfig = {
         let config = RemoteConfig.remoteConfig()

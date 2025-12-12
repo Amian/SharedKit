@@ -7,25 +7,46 @@ public struct OnboardingFlowView: View {
     let steps: [OnboardingStep]
     let onFinish: (_ responses: [OnboardingResponse]) -> Void
     let onStepChange: ((Int) -> Void)?
+    let configuration: OnboardingFlowConfiguration
 
     @State private var currentIndex: Int = 0
     @State private var selections: [Int: Set<UUID>] = [:]
 
     public init(
         steps: [OnboardingStep],
+        reviewStep: OnboardingReviewStep? = nil,
+        reviewInsertionIndex: Int? = nil,
         onFinish: @escaping (_ responses: [OnboardingResponse]) -> Void,
-        onStepChange: ((Int) -> Void)? = nil
+        onStepChange: ((Int) -> Void)? = nil,
+        configuration: OnboardingFlowConfiguration = OnboardingFlowConfiguration()
     ) {
-        self.steps = steps
+        self.steps = Self.insert(reviewStep, into: steps, at: reviewInsertionIndex)
         self.onFinish = onFinish
         self.onStepChange = onStepChange
+        self.configuration = configuration
+    }
+
+    public init(
+        steps: [OnboardingStep],
+        onFinish: @escaping (_ responses: [OnboardingResponse]) -> Void,
+        onStepChange: ((Int) -> Void)? = nil,
+        configuration: OnboardingFlowConfiguration = OnboardingFlowConfiguration()
+    ) {
+        self.init(
+            steps: steps,
+            reviewStep: nil,
+            reviewInsertionIndex: nil,
+            onFinish: onFinish,
+            onStepChange: onStepChange,
+            configuration: configuration
+        )
     }
 
     public var body: some View {
         let step = steps[currentIndex]
 
         VStack(spacing: 0) {
-            if steps.count > 1 {
+            if configuration.showsBreadcrumbs && steps.count > 1 {
                 progressOverlay
                     .padding(.horizontal, 20)
                     .padding(.top, 28)
@@ -55,6 +76,10 @@ public struct OnboardingFlowView: View {
                     selections: binding(for: currentIndex),
                     onAdvance: advance
                 )
+            case .review(let review):
+                OnboardingReviewView(step: review) {
+                    advance()
+                }
             }
         }
     }
@@ -65,6 +90,8 @@ public struct OnboardingFlowView: View {
             return info.backgroundColor
         case .question(let question):
             return question.backgroundColor
+        case .review(let review):
+            return review.backgroundColor
         }
     }
 
@@ -113,6 +140,8 @@ public struct OnboardingFlowView: View {
             case .question:
                 let selected = selections[idx] ?? []
                 responses.append(OnboardingResponse(stepIndex: idx, step: step, selectedOptionIDs: Array(selected)))
+            case .review:
+                responses.append(OnboardingResponse(stepIndex: idx, step: step, selectedOptionIDs: nil))
             }
         }
         onFinish(responses)
@@ -132,6 +161,8 @@ public struct OnboardingFlowView: View {
             return info.accentColor
         case .question(let question):
             return question.accentColor
+        case .review(let review):
+            return review.accentColor
         }
     }
 
@@ -150,6 +181,25 @@ public struct OnboardingFlowView: View {
             return info.appearance.preferredColorScheme ?? systemScheme
         case .question(let question):
             return question.appearance.preferredColorScheme ?? systemScheme
+        case .review(let review):
+            return review.appearance.preferredColorScheme ?? systemScheme
         }
+    }
+
+    private static func insert(
+        _ reviewStep: OnboardingReviewStep?,
+        into steps: [OnboardingStep],
+        at index: Int?
+    ) -> [OnboardingStep] {
+        guard let reviewStep else { return steps }
+        let clampedIndex: Int
+        if let index {
+            clampedIndex = max(0, min(index, steps.count))
+        } else {
+            clampedIndex = steps.count
+        }
+        var updated = steps
+        updated.insert(.review(reviewStep), at: clampedIndex)
+        return updated
     }
 }

@@ -183,6 +183,7 @@ public struct OnboardingQuestionStep: Hashable {
 public enum OnboardingStep: Hashable {
     case info(OnboardingInfoStep)
     case question(OnboardingQuestionStep)
+    case review(OnboardingReviewStep)
 }
 
 @available(iOS 17.0, macOS 11.0, *)
@@ -190,4 +191,42 @@ public struct OnboardingResponse {
     public let stepIndex: Int
     public let step: OnboardingStep
     public let selectedOptionIDs: [UUID]?
+}
+
+@available(iOS 17.0, macOS 11.0, *)
+public struct OnboardingFlowConfiguration: Hashable {
+    public var showsBreadcrumbs: Bool
+
+    public init(showsBreadcrumbs: Bool = true) {
+        self.showsBreadcrumbs = showsBreadcrumbs
+    }
+}
+
+@available(iOS 17.0, macOS 11.0, *)
+public struct OnboardingReviewStep: Hashable {
+    public var imageName: String?
+    public var title: String
+    public var subtitle: String?
+    public var ctaTitle: String
+    public var accentColor: Color
+    public var backgroundColor: Color
+    public var appearance: OnboardingAppearancePreference
+
+    public init(
+        imageName: String? = nil,
+        title: String,
+        subtitle: String? = nil,
+        ctaTitle: String = "Continue",
+        accentColor: Color = Color.green,
+        backgroundColor: Color = .designSystemBackground,
+        appearance: OnboardingAppearancePreference = .system
+    ) {
+        self.imageName = imageName
+        self.title = title
+        self.subtitle = subtitle
+        self.ctaTitle = ctaTitle
+        self.accentColor = accentColor
+        self.backgroundColor = backgroundColor
+        self.appearance = appearance
+    }
 }
