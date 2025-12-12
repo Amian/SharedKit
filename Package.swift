@@ -11,7 +11,7 @@ let package = Package(
     products: [
         .library(
             name: "DesignSystem",
-            targets: ["DesignSystem"]
+            targets: ["DesignSystem", "AppBrowser"]
         ),
         .library(
             name: "FirebaseKit",
@@ -58,6 +58,12 @@ let package = Package(
         ),
         .target(
             name: "Onboarding",
+            dependencies: [
+                "DesignSystem"
+            ]
+        ),
+        .target(
+            name: "AppBrowser",
             dependencies: [
                 "DesignSystem"
             ]
