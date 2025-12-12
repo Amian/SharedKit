@@ -2,10 +2,12 @@ import Combine
 import SwiftUI
 import UIKit
 
+@MainActor
 private final class ImageCache {
     static let shared = NSCache<NSURL, UIImage>()
 }
 
+@MainActor
 private final class CachedImageLoader: ObservableObject {
     @Published var image: UIImage?
 
