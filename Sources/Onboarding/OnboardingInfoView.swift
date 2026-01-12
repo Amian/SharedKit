@@ -32,8 +32,18 @@ struct OnboardingInfoView: View {
 
             Spacer()
 
-            primaryButton
-                .padding(.bottom, 24)
+            if step.showsCTA {
+                primaryButton
+                    .padding(.bottom, 24)
+            }
+        }
+        .task(id: step) {
+            guard let delay = step.autoAdvanceAfter else { return }
+            let nanoseconds = UInt64(delay * 1_000_000_000)
+            try? await Task.sleep(nanoseconds: nanoseconds)
+            await MainActor.run {
+                action()
+            }
         }
     }
 

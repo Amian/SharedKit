@@ -59,12 +59,14 @@ public struct OnboardingInfoStep: Hashable {
     public var title: String
     public var subtitle: String?
     public var ctaTitle: String
+    public var showsCTA: Bool
     public var accentColor: Color
     public var backgroundColor: Color
     public var appearance: OnboardingAppearancePreference
     public var imagePlacement: OnboardingInfoImagePlacement
     public var accessoryPlacement: OnboardingInfoAccessoryPlacement
     public var accessory: AnyView?
+    public var autoAdvanceAfter: TimeInterval?
 
     public init(
         imageName: String? = nil,
@@ -72,17 +74,20 @@ public struct OnboardingInfoStep: Hashable {
         title: String,
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
+        showsCTA: Bool = true,
         accentColor: Color = Color.green,
         backgroundColor: Color = .designSystemBackground,
         appearance: OnboardingAppearancePreference = .system,
         imagePlacement: OnboardingInfoImagePlacement = .top,
         accessoryPlacement: OnboardingInfoAccessoryPlacement = .afterContentBeforeCTA,
-        accessory: AnyView? = nil
+        accessory: AnyView? = nil,
+        autoAdvanceAfter: TimeInterval? = nil
     ) {
         self.imageName = imageName
         self.title = title
         self.subtitle = subtitle
         self.ctaTitle = ctaTitle
+        self.showsCTA = showsCTA
         self.accentColor = accentColor
         self.backgroundColor = backgroundColor
         self.appearance = appearance
@@ -90,6 +95,7 @@ public struct OnboardingInfoStep: Hashable {
         self.accessoryPlacement = accessoryPlacement
         self.accessory = accessory
         self.gifName = gifName
+        self.autoAdvanceAfter = autoAdvanceAfter
     }
 
     public init<Accessory: View>(
@@ -98,11 +104,13 @@ public struct OnboardingInfoStep: Hashable {
         title: String,
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
+        showsCTA: Bool = true,
         accentColor: Color = Color.green,
         backgroundColor: Color = .designSystemBackground,
         appearance: OnboardingAppearancePreference = .system,
         imagePlacement: OnboardingInfoImagePlacement = .top,
         accessoryPlacement: OnboardingInfoAccessoryPlacement = .afterContentBeforeCTA,
+        autoAdvanceAfter: TimeInterval? = nil,
         @ViewBuilder accessory: () -> Accessory
     ) {
         self.init(
@@ -110,12 +118,14 @@ public struct OnboardingInfoStep: Hashable {
             gifName: gifName, title: title,
             subtitle: subtitle,
             ctaTitle: ctaTitle,
+            showsCTA: showsCTA,
             accentColor: accentColor,
             backgroundColor: backgroundColor,
             appearance: appearance,
             imagePlacement: imagePlacement,
             accessoryPlacement: accessoryPlacement,
-            accessory: AnyView(accessory())
+            accessory: AnyView(accessory()),
+            autoAdvanceAfter: autoAdvanceAfter
         )
     }
 
@@ -125,11 +135,13 @@ public struct OnboardingInfoStep: Hashable {
         lhs.title == rhs.title &&
         lhs.subtitle == rhs.subtitle &&
         lhs.ctaTitle == rhs.ctaTitle &&
+        lhs.showsCTA == rhs.showsCTA &&
         lhs.accentColor == rhs.accentColor &&
         lhs.backgroundColor == rhs.backgroundColor &&
         lhs.appearance == rhs.appearance &&
         lhs.imagePlacement == rhs.imagePlacement &&
-        lhs.accessoryPlacement == rhs.accessoryPlacement
+        lhs.accessoryPlacement == rhs.accessoryPlacement &&
+        lhs.autoAdvanceAfter == rhs.autoAdvanceAfter
     }
 
     public func hash(into hasher: inout Hasher) {
@@ -137,10 +149,12 @@ public struct OnboardingInfoStep: Hashable {
         hasher.combine(title)
         hasher.combine(subtitle)
         hasher.combine(ctaTitle)
+        hasher.combine(showsCTA)
         hasher.combine(appearance)
         hasher.combine(imagePlacement)
         hasher.combine(accessoryPlacement)
         hasher.combine(gifName)
+        hasher.combine(autoAdvanceAfter)
     }
 }
 

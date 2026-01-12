@@ -1,7 +1,5 @@
 import SwiftUI
 
-import SwiftUI
-
 public struct PaywallConfiguration: Hashable {
     public enum AppearancePreference: Hashable {
         case system
@@ -26,6 +24,7 @@ public struct PaywallConfiguration: Hashable {
     public var appearance: AppearancePreference
     public var headline: String
     public var subheadline: String
+    public var heroImageName: String?
     public var heroGIFName: String?
 
     public init(
@@ -38,6 +37,7 @@ public struct PaywallConfiguration: Hashable {
         appearance: AppearancePreference = .system,
         headline: String = "Unlock Premium",
         subheadline: String = "Unlock your full potential with complete access",
+        heroImageName: String? = nil,
         heroGIFName: String? = nil
     ) {
         self.revenueCatPublicKey = revenueCatPublicKey
@@ -49,6 +49,7 @@ public struct PaywallConfiguration: Hashable {
         self.appearance = appearance
         self.headline = headline
         self.subheadline = subheadline
+        self.heroImageName = heroImageName
         self.heroGIFName = heroGIFName
     }
 }

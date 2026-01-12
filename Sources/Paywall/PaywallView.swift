@@ -168,7 +168,12 @@ public struct PaywallView: View {
     private func heroVisual(for availableHeight: CGFloat) -> some View {
         let size: CGFloat = availableHeight < 700 ? 90 : 110
 
-        if let gifName = configuration.heroGIFName {
+        if let imageName = configuration.heroImageName {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+        } else if let gifName = configuration.heroGIFName {
             AnimatedGIFView(resourceName: gifName)
                 .frame(width: size, height: size)
 //                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
