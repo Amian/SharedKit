@@ -22,21 +22,20 @@ struct OnboardingInfoView: View {
 
     private var content: some View {
         VStack(spacing: 24) {
-            Spacer(minLength: 12)
-
             contentStack
+                .frame(maxHeight: .infinity)
 
             if step.accessoryPlacement == .afterContentBeforeCTA {
                 accessoryView
             }
-
-            Spacer()
 
             if step.showsCTA {
                 primaryButton
                     .padding(.bottom, 24)
             }
         }
+        .frame(maxHeight: .infinity)
+        .padding(.top, 12)
         .task(id: step) {
             guard let delay = step.autoAdvanceAfter else { return }
             let nanoseconds = UInt64(delay * 1_000_000_000)
@@ -158,14 +157,13 @@ struct OnboardingInfoView: View {
     private var imageView: some View {
         if let gifName = step.gifName {
             AnimatedGIFView(resourceName: gifName)
-//                .frame(maxWidth: 220, maxHeight: 220)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 12)
         } else if let imageName = step.imageName {
             Image(imageName)
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: 220, maxHeight: 220)
-//                .shadow(color: .black.opacity(0.15), radius: 25, x: 0, y: 12)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 12)
         }
     }

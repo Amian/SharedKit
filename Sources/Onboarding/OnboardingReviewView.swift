@@ -19,13 +19,10 @@ struct OnboardingReviewView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 24) {
-                Spacer(minLength: 12)
-
                 content
-                    .frame(maxWidth: 480)
+                    .frame(maxWidth: 480, maxHeight: .infinity)
                     .padding(.horizontal, 24)
-
-                Spacer()
+                    .padding(.top, 12)
 
                 primaryButton
                     .padding(.horizontal, 24)
@@ -104,7 +101,7 @@ struct OnboardingReviewView: View {
                 Image(imageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: 220, maxHeight: 220)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .padding(.vertical, 12)
             }
         }
