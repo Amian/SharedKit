@@ -21,20 +21,37 @@ struct OnboardingInfoView: View {
     }
 
     private var content: some View {
-        VStack(spacing: 24) {
-            contentStack
+        Group {
+            if step.backgroundImageName != nil {
+                VStack(spacing: 24) {
+                    Spacer(minLength: 0)
+                    contentStack
+                    if step.accessoryPlacement == .afterContentBeforeCTA {
+                        accessoryView
+                    }
+                    if step.showsCTA {
+                        primaryButton
+                            .padding(.bottom, 24)
+                    }
+                }
+                .frame(maxHeight: .infinity, alignment: .bottom)
+            } else {
+                VStack(spacing: 24) {
+                    contentStack
+                        .frame(maxHeight: .infinity)
+
+                    if step.accessoryPlacement == .afterContentBeforeCTA {
+                        accessoryView
+                    }
+
+                    if step.showsCTA {
+                        primaryButton
+                            .padding(.bottom, 24)
+                    }
+                }
                 .frame(maxHeight: .infinity)
-
-            if step.accessoryPlacement == .afterContentBeforeCTA {
-                accessoryView
-            }
-
-            if step.showsCTA {
-                primaryButton
-                    .padding(.bottom, 24)
             }
         }
-        .frame(maxHeight: .infinity)
         .padding(.top, 12)
         .task(id: step) {
             guard let delay = step.autoAdvanceAfter else { return }
@@ -51,11 +68,15 @@ struct OnboardingInfoView: View {
     }
 
     private var titleColor: Color {
-        resolvedScheme == .dark ? Color.white : Color(red: 15/255, green: 23/255, blue: 42/255)
+        step.titleColor ?? (resolvedScheme == .dark
+            ? Color.white
+            : Color(red: 15/255, green: 23/255, blue: 42/255))
     }
 
     private var subtitleColor: Color {
-        resolvedScheme == .dark ? Color.white.opacity(0.75) : Color(red: 71/255, green: 85/255, blue: 105/255)
+        step.subtitleColor ?? (resolvedScheme == .dark
+            ? Color.white.opacity(0.75)
+            : Color(red: 71/255, green: 85/255, blue: 105/255))
     }
 
     private var primaryButton: some View {
@@ -84,8 +105,14 @@ struct OnboardingInfoView: View {
     }
 
     private var backgroundView: some View {
-        step.backgroundColor
-            .ignoresSafeArea()
+        Group {
+            if step.backgroundImageName != nil {
+                Color.clear
+            } else {
+                step.backgroundColor
+            }
+        }
+        .ignoresSafeArea()
     }
 
     private var lightBackgroundColors: [Color] {
@@ -134,11 +161,13 @@ struct OnboardingInfoView: View {
 
     @ViewBuilder
     private var titleView: some View {
-        Text(step.title)
-            .font(typography.title)
-            .foregroundColor(titleColor)
-            .multilineTextAlignment(.center)
-            .lineSpacing(6)
+        if step.title.isEmpty == false {
+            Text(step.title)
+                .font(typography.title)
+                .foregroundColor(titleColor)
+                .multilineTextAlignment(.center)
+                .lineSpacing(6)
+        }
     }
 
     @ViewBuilder

@@ -64,6 +64,8 @@ public struct OnboardingInfoStep: Hashable {
     public var showsCTA: Bool
     public var accentColor: Color
     public var backgroundColor: Color
+    public var titleColor: Color?
+    public var subtitleColor: Color?
     public var appearance: OnboardingAppearancePreference
     public var imagePlacement: OnboardingInfoImagePlacement
     public var accessoryPlacement: OnboardingInfoAccessoryPlacement
@@ -81,6 +83,8 @@ public struct OnboardingInfoStep: Hashable {
         showsCTA: Bool = true,
         accentColor: Color = Color.green,
         backgroundColor: Color = .designSystemBackground,
+        titleColor: Color? = nil,
+        subtitleColor: Color? = nil,
         appearance: OnboardingAppearancePreference = .system,
         imagePlacement: OnboardingInfoImagePlacement = .top,
         accessoryPlacement: OnboardingInfoAccessoryPlacement = .afterContentBeforeCTA,
@@ -96,6 +100,8 @@ public struct OnboardingInfoStep: Hashable {
         self.showsCTA = showsCTA
         self.accentColor = accentColor
         self.backgroundColor = backgroundColor
+        self.titleColor = titleColor
+        self.subtitleColor = subtitleColor
         self.appearance = appearance
         self.imagePlacement = imagePlacement
         self.accessoryPlacement = accessoryPlacement
@@ -115,6 +121,8 @@ public struct OnboardingInfoStep: Hashable {
         showsCTA: Bool = true,
         accentColor: Color = Color.green,
         backgroundColor: Color = .designSystemBackground,
+        titleColor: Color? = nil,
+        subtitleColor: Color? = nil,
         appearance: OnboardingAppearancePreference = .system,
         imagePlacement: OnboardingInfoImagePlacement = .top,
         accessoryPlacement: OnboardingInfoAccessoryPlacement = .afterContentBeforeCTA,
@@ -132,6 +140,8 @@ public struct OnboardingInfoStep: Hashable {
             showsCTA: showsCTA,
             accentColor: accentColor,
             backgroundColor: backgroundColor,
+            titleColor: titleColor,
+            subtitleColor: subtitleColor,
             appearance: appearance,
             imagePlacement: imagePlacement,
             accessoryPlacement: accessoryPlacement,
@@ -151,6 +161,8 @@ public struct OnboardingInfoStep: Hashable {
         lhs.showsCTA == rhs.showsCTA &&
         lhs.accentColor == rhs.accentColor &&
         lhs.backgroundColor == rhs.backgroundColor &&
+        lhs.titleColor == rhs.titleColor &&
+        lhs.subtitleColor == rhs.subtitleColor &&
         lhs.appearance == rhs.appearance &&
         lhs.imagePlacement == rhs.imagePlacement &&
         lhs.accessoryPlacement == rhs.accessoryPlacement &&
@@ -170,6 +182,8 @@ public struct OnboardingInfoStep: Hashable {
         hasher.combine(backgroundImageName)
         hasher.combine(videoName)
         hasher.combine(autoAdvanceAfter)
+        hasher.combine(titleColor?.description)
+        hasher.combine(subtitleColor?.description)
     }
 }
 
@@ -243,6 +257,8 @@ public struct OnboardingReviewStep: Hashable {
     public var ctaTitle: String
     public var accentColor: Color
     public var backgroundColor: Color
+    public var titleColor: Color?
+    public var subtitleColor: Color?
     public var appearance: OnboardingAppearancePreference
 
     public init(
@@ -253,6 +269,8 @@ public struct OnboardingReviewStep: Hashable {
         ctaTitle: String = "Continue",
         accentColor: Color = Color.green,
         backgroundColor: Color = .designSystemBackground,
+        titleColor: Color? = nil,
+        subtitleColor: Color? = nil,
         appearance: OnboardingAppearancePreference = .system
     ) {
         self.imageName = imageName
@@ -262,6 +280,8 @@ public struct OnboardingReviewStep: Hashable {
         self.ctaTitle = ctaTitle
         self.accentColor = accentColor
         self.backgroundColor = backgroundColor
+        self.titleColor = titleColor
+        self.subtitleColor = subtitleColor
         self.appearance = appearance
     }
 }

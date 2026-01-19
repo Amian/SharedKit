@@ -23,10 +23,6 @@ struct CompactPremiumPackageCard: View {
         colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.1)
     }
 
-    private var isPopular: Bool {
-        package.packageType == .annual || package.packageType == .sixMonth
-    }
-
     private var savings: String? {
         switch package.packageType {
         case .annual:
@@ -36,6 +32,10 @@ struct CompactPremiumPackageCard: View {
         default:
             return nil
         }
+    }
+
+    private var tagLabel: String? {
+        return savings?.uppercased()
     }
 
     private var defaultSubtitle: String {
@@ -70,8 +70,8 @@ struct CompactPremiumPackageCard: View {
                             .font(typography.listTitle)
                             .foregroundColor(primaryTextColor)
 
-                        if isPopular {
-                            Text("POPULAR")
+                        if let tagLabel {
+                            Text(tagLabel)
                                 .font(typography.labelCaps)
                                 .foregroundColor(.black)
                                 .padding(.horizontal, 6)
@@ -79,12 +79,6 @@ struct CompactPremiumPackageCard: View {
                                 .background(Color.yellow)
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
                         }
-                    }
-
-                    if let savings {
-                        Text(savings)
-                            .font(typography.listSubtitle)
-                            .foregroundColor(.green)
                     }
 
                     Text(priceDescription)
@@ -179,10 +173,6 @@ struct UltraCompactPackageCard: View {
         colorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.1)
     }
 
-    private var isPopular: Bool {
-        package.packageType == .annual || package.packageType == .sixMonth
-    }
-
     private var savings: String? {
         switch package.packageType {
         case .annual:
@@ -192,6 +182,10 @@ struct UltraCompactPackageCard: View {
         default:
             return nil
         }
+    }
+
+    private var tagLabel: String? {
+        return savings?.uppercased()
     }
 
     private var defaultSubtitle: String {
@@ -226,8 +220,8 @@ struct UltraCompactPackageCard: View {
                         .font(isSmallScreen ? typography.listSubtitle : typography.listTitle)
                         .foregroundColor(primaryTextColor)
 
-                        if isPopular {
-                            Text("POPULAR")
+                        if let tagLabel {
+                            Text(tagLabel)
                                 .font(typography.labelCaps)
                                 .foregroundColor(.black)
                                 .padding(.horizontal, 4)
@@ -235,12 +229,6 @@ struct UltraCompactPackageCard: View {
                                 .background(Color.yellow)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
-                    }
-
-                    if let savings {
-                        Text(savings)
-                            .font(typography.listSubtitle)
-                            .foregroundColor(.green)
                     }
 
                     if showFreeTrial, package.storeProduct.introductoryDiscount != nil {

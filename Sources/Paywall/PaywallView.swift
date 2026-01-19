@@ -66,6 +66,12 @@ public struct PaywallView: View {
     private var chipBackgroundColor: Color {
         resolvedColorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05)
     }
+    private var shouldUseEdgeToEdgeHero: Bool {
+        configuration.heroImageStyle == .edgeToEdge && configuration.heroImageName != nil
+    }
+    private var hasHeroVisual: Bool {
+        configuration.heroImageName != nil || configuration.heroGIFName != nil
+    }
 
     public var body: some View {
         GeometryReader { geometry in
@@ -126,31 +132,15 @@ public struct PaywallView: View {
     }
     
     private func headerSection(geometry: GeometryProxy) -> some View {
-        VStack(spacing: geometry.size.height < 700 ? 8 : 12) {
-            HStack(alignment: .top) {
-                Color.clear
-                    .frame(width: 32, height: 32)
-                Spacer()
-                    heroVisual(for: geometry.size.height)
-                Spacer()
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(secondaryTextColor)
-                        .frame(width: 32, height: 32)
-                        .background(chipBackgroundColor)
-                        .clipShape(Circle())
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
-            .opacity(showCloseButton ? 1 : 0)
-            
-            
+        let titleSpacing = geometry.size.height < 700 ? 12.0 : 18.0
+
+        return VStack(spacing: geometry.size.height < 700 ? 8 : 12) {
+            heroHeaderRow(geometry: geometry)
+                .padding(.bottom, hasHeroVisual ? titleSpacing : 0)
 
             VStack(spacing: 4) {
                 Text(configuration.headline)
-                    .font(geometry.size.height < 700 ? typography.headingLarge : typography.title)
+                    .font(geometry.size.height < 700 ? typography.title : typography.displayLarge)
                     .foregroundColor(primaryTextColor)
                     .multilineTextAlignment(.center)
 
@@ -161,6 +151,74 @@ public struct PaywallView: View {
                     .padding(.horizontal, 20)
                     .lineLimit(nil)
             }
+        }
+    }
+
+    @ViewBuilder
+    private func heroHeaderRow(geometry: GeometryProxy) -> some View {
+        if shouldUseEdgeToEdgeHero {
+            edgeToEdgeHero(for: geometry)
+        } else {
+            standardHeroRow(for: geometry)
+        }
+    }
+
+    private func standardHeroRow(for geometry: GeometryProxy) -> some View {
+        HStack(alignment: .top) {
+            Color.clear
+                .frame(width: 32, height: 32)
+            Spacer()
+            heroVisual(for: geometry.size.height)
+            Spacer()
+            closeButton
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .opacity(showCloseButton ? 1 : 0)
+    }
+
+    @ViewBuilder
+    private func edgeToEdgeHero(for geometry: GeometryProxy) -> some View {
+        if let imageName = configuration.heroImageName {
+            ZStack(alignment: .topTrailing) {
+                Image(imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+                    .overlay(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                .init(color: backgroundColor, location: 0.0),
+                                .init(color: backgroundColor.opacity(0), location: 0.3),
+                                .init(color: backgroundColor.opacity(0), location: 0.0),
+                                .init(color: backgroundColor.opacity(0), location: 0.0)
+                            ]),
+                            startPoint: .bottom,
+                            endPoint: .top
+                        )
+                    )
+
+                closeButton
+                    .padding(.top, max(8, geometry.safeAreaInsets.top + 8))
+                    .padding(.trailing, 20)
+                    .opacity(showCloseButton ? 1 : 0)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, -geometry.safeAreaInsets.top)
+            .ignoresSafeArea(edges: [.top, .horizontal])
+        } else {
+            standardHeroRow(for: geometry)
+        }
+    }
+
+    private var closeButton: some View {
+        Button(action: { dismiss() }) {
+            Image(systemName: "xmark")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundColor(secondaryTextColor)
+                .frame(width: 32, height: 32)
+                .background(chipBackgroundColor)
+                .clipShape(Circle())
         }
     }
 

@@ -80,7 +80,9 @@ let paywallConfig = PaywallConfiguration(
     termsOfServiceURL: URL(string: "https://example.com/terms"),
     appearance: .system, // or .light / .dark to force a theme
     headline: "Unlock Everything",
-    subheadline: "Pick the plan that’s right for you"
+    subheadline: "Pick the plan that’s right for you",
+    heroImageName: "card-bg",
+    heroImageStyle: .edgeToEdge
 )
 ```
 

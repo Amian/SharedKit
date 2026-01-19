@@ -15,8 +15,7 @@ struct OnboardingReviewView: View {
 
     var body: some View {
         ZStack {
-            step.backgroundColor
-                .ignoresSafeArea()
+            backgroundView
 
             VStack(spacing: 24) {
                 content
@@ -108,11 +107,31 @@ struct OnboardingReviewView: View {
     }
 
     private var titleColor: Color {
-        step.appearance.preferredColorScheme == .dark ? Color.white : Color(red: 15/255, green: 23/255, blue: 42/255)
+        step.titleColor ?? (step.appearance.preferredColorScheme == .dark
+            ? Color.white
+            : Color(red: 15/255, green: 23/255, blue: 42/255))
     }
 
     private var subtitleColor: Color {
-        step.appearance.preferredColorScheme == .dark ? Color.white.opacity(0.75) : Color(red: 71/255, green: 85/255, blue: 105/255)
+        step.subtitleColor ?? (step.appearance.preferredColorScheme == .dark
+            ? Color.white.opacity(0.75)
+            : Color(red: 71/255, green: 85/255, blue: 105/255))
+    }
+
+    private var backgroundView: some View {
+        Group {
+            if let imageName = step.backgroundImageName {
+                ZStack {
+                    step.backgroundColor
+                    Image(imageName)
+                        .resizable()
+                        .scaledToFill()
+                }
+            } else {
+                step.backgroundColor
+            }
+        }
+        .ignoresSafeArea()
     }
 
     private func requestReview() {

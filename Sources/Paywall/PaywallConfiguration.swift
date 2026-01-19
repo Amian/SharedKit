@@ -15,6 +15,11 @@ public struct PaywallConfiguration: Hashable {
         }
     }
 
+    public enum HeroImageStyle: Hashable {
+        case contained
+        case edgeToEdge
+    }
+
     public var revenueCatPublicKey: String
     public var offeringIdentifier: String?
     public var accentColor: Color
@@ -26,6 +31,7 @@ public struct PaywallConfiguration: Hashable {
     public var subheadline: String
     public var heroImageName: String?
     public var heroGIFName: String?
+    public var heroImageStyle: HeroImageStyle
 
     public init(
         revenueCatPublicKey: String,
@@ -38,7 +44,8 @@ public struct PaywallConfiguration: Hashable {
         headline: String = "Unlock Premium",
         subheadline: String = "Unlock your full potential with complete access",
         heroImageName: String? = nil,
-        heroGIFName: String? = nil
+        heroGIFName: String? = nil,
+        heroImageStyle: HeroImageStyle = .contained
     ) {
         self.revenueCatPublicKey = revenueCatPublicKey
         self.offeringIdentifier = offeringIdentifier
@@ -51,5 +58,6 @@ public struct PaywallConfiguration: Hashable {
         self.subheadline = subheadline
         self.heroImageName = heroImageName
         self.heroGIFName = heroGIFName
+        self.heroImageStyle = heroImageStyle
     }
 }
