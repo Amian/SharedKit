@@ -56,6 +56,8 @@ public enum OnboardingInfoAccessoryPlacement: Hashable {
 public struct OnboardingInfoStep: Hashable {
     public var imageName: String?
     public var gifName: String?
+    public var backgroundImageName: String?
+    public var videoName: String?
     public var title: String
     public var subtitle: String?
     public var ctaTitle: String
@@ -71,6 +73,8 @@ public struct OnboardingInfoStep: Hashable {
     public init(
         imageName: String? = nil,
         gifName: String? = nil,
+        backgroundImageName: String? = nil,
+        videoName: String? = nil,
         title: String,
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
@@ -84,6 +88,8 @@ public struct OnboardingInfoStep: Hashable {
         autoAdvanceAfter: TimeInterval? = nil
     ) {
         self.imageName = imageName
+        self.backgroundImageName = backgroundImageName
+        self.videoName = videoName
         self.title = title
         self.subtitle = subtitle
         self.ctaTitle = ctaTitle
@@ -101,6 +107,8 @@ public struct OnboardingInfoStep: Hashable {
     public init<Accessory: View>(
         imageName: String? = nil,
         gifName: String? = nil,
+        backgroundImageName: String? = nil,
+        videoName: String? = nil,
         title: String,
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
@@ -116,6 +124,8 @@ public struct OnboardingInfoStep: Hashable {
         self.init(
             imageName: imageName,
             gifName: gifName, title: title,
+            backgroundImageName: backgroundImageName,
+            videoName: videoName,
             subtitle: subtitle,
             ctaTitle: ctaTitle,
             showsCTA: showsCTA,
@@ -132,6 +142,8 @@ public struct OnboardingInfoStep: Hashable {
     public static func == (lhs: OnboardingInfoStep, rhs: OnboardingInfoStep) -> Bool {
         lhs.imageName == rhs.imageName &&
         lhs.gifName == rhs.gifName &&
+        lhs.backgroundImageName == rhs.backgroundImageName &&
+        lhs.videoName == rhs.videoName &&
         lhs.title == rhs.title &&
         lhs.subtitle == rhs.subtitle &&
         lhs.ctaTitle == rhs.ctaTitle &&
@@ -154,6 +166,8 @@ public struct OnboardingInfoStep: Hashable {
         hasher.combine(imagePlacement)
         hasher.combine(accessoryPlacement)
         hasher.combine(gifName)
+        hasher.combine(backgroundImageName)
+        hasher.combine(videoName)
         hasher.combine(autoAdvanceAfter)
     }
 }
@@ -161,6 +175,7 @@ public struct OnboardingInfoStep: Hashable {
 @available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingQuestionStep: Hashable {
     public var imageName: String?
+    public var backgroundImageName: String?
     public var title: String
     public var subtitle: String?
     public var allowsMultipleSelection: Bool
@@ -172,6 +187,7 @@ public struct OnboardingQuestionStep: Hashable {
 
     public init(
         imageName: String? = nil,
+        backgroundImageName: String? = nil,
         title: String,
         subtitle: String? = nil,
         allowsMultipleSelection: Bool = false,
@@ -182,6 +198,7 @@ public struct OnboardingQuestionStep: Hashable {
         appearance: OnboardingAppearancePreference = .system
     ) {
         self.imageName = imageName
+        self.backgroundImageName = backgroundImageName
         self.title = title
         self.subtitle = subtitle
         self.allowsMultipleSelection = allowsMultipleSelection
@@ -219,6 +236,7 @@ public struct OnboardingFlowConfiguration: Hashable {
 @available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingReviewStep: Hashable {
     public var imageName: String?
+    public var backgroundImageName: String?
     public var title: String
     public var subtitle: String?
     public var ctaTitle: String
@@ -228,6 +246,7 @@ public struct OnboardingReviewStep: Hashable {
 
     public init(
         imageName: String? = nil,
+        backgroundImageName: String? = nil,
         title: String,
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
@@ -236,6 +255,7 @@ public struct OnboardingReviewStep: Hashable {
         appearance: OnboardingAppearancePreference = .system
     ) {
         self.imageName = imageName
+        self.backgroundImageName = backgroundImageName
         self.title = title
         self.subtitle = subtitle
         self.ctaTitle = ctaTitle

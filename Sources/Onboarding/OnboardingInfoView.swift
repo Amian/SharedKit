@@ -155,7 +155,12 @@ struct OnboardingInfoView: View {
 
     @ViewBuilder
     private var imageView: some View {
-        if let gifName = step.gifName {
+        if let videoName = step.videoName, let url = videoURL(for: videoName) {
+            LoopingVideoView(url: url)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 12)
+                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        } else if let gifName = step.gifName {
             AnimatedGIFView(resourceName: gifName)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 12)
@@ -166,6 +171,16 @@ struct OnboardingInfoView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 12)
         }
+    }
+
+    private func videoURL(for name: String) -> URL? {
+        let nsName = name as NSString
+        let ext = nsName.pathExtension
+        let baseName = nsName.deletingPathExtension
+        if ext.isEmpty {
+            return Bundle.main.url(forResource: name, withExtension: nil)
+        }
+        return Bundle.main.url(forResource: baseName, withExtension: ext)
     }
 
     @ViewBuilder

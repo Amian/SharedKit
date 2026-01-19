@@ -60,7 +60,7 @@ public struct OnboardingFlowView: View {
         }
         .animation(.easeInOut, value: currentIndex)
         .preferredColorScheme(resolvedColorScheme(for: step))
-        .background(backgroundColor(for: step).ignoresSafeArea())
+        .background(backgroundView(for: step).ignoresSafeArea())
     }
 
     private func contentView(for step: OnboardingStep) -> some View {
@@ -92,6 +92,31 @@ public struct OnboardingFlowView: View {
             return question.backgroundColor
         case .review(let review):
             return review.backgroundColor
+        }
+    }
+
+    private func backgroundImageName(for step: OnboardingStep) -> String? {
+        switch step {
+        case .info(let info):
+            return info.backgroundImageName
+        case .question(let question):
+            return question.backgroundImageName
+        case .review(let review):
+            return review.backgroundImageName
+        }
+    }
+
+    @ViewBuilder
+    private func backgroundView(for step: OnboardingStep) -> some View {
+        if let imageName = backgroundImageName(for: step) {
+            ZStack {
+                backgroundColor(for: step)
+                Image(imageName)
+                    .resizable()
+                    .scaledToFill()
+            }
+        } else {
+            backgroundColor(for: step)
         }
     }
 
