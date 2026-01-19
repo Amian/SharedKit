@@ -123,9 +123,10 @@ public struct OnboardingInfoStep: Hashable {
     ) {
         self.init(
             imageName: imageName,
-            gifName: gifName, title: title,
+            gifName: gifName,
             backgroundImageName: backgroundImageName,
             videoName: videoName,
+            title: title,
             subtitle: subtitle,
             ctaTitle: ctaTitle,
             showsCTA: showsCTA,
