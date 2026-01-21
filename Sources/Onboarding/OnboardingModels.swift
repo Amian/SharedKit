@@ -53,6 +53,13 @@ public enum OnboardingInfoAccessoryPlacement: Hashable {
 }
 
 @available(iOS 17.0, macOS 11.0, *)
+public enum OnboardingInfoContentAlignment: Hashable {
+    case top
+    case center
+    case bottom
+}
+
+@available(iOS 17.0, macOS 11.0, *)
 public struct OnboardingInfoStep: Hashable {
     public var imageName: String?
     public var gifName: String?
@@ -69,6 +76,7 @@ public struct OnboardingInfoStep: Hashable {
     public var appearance: OnboardingAppearancePreference
     public var imagePlacement: OnboardingInfoImagePlacement
     public var accessoryPlacement: OnboardingInfoAccessoryPlacement
+    public var contentAlignment: OnboardingInfoContentAlignment
     public var accessory: AnyView?
     public var autoAdvanceAfter: TimeInterval?
 
@@ -88,6 +96,7 @@ public struct OnboardingInfoStep: Hashable {
         appearance: OnboardingAppearancePreference = .system,
         imagePlacement: OnboardingInfoImagePlacement = .top,
         accessoryPlacement: OnboardingInfoAccessoryPlacement = .afterContentBeforeCTA,
+        contentAlignment: OnboardingInfoContentAlignment = .bottom,
         accessory: AnyView? = nil,
         autoAdvanceAfter: TimeInterval? = nil
     ) {
@@ -105,6 +114,7 @@ public struct OnboardingInfoStep: Hashable {
         self.appearance = appearance
         self.imagePlacement = imagePlacement
         self.accessoryPlacement = accessoryPlacement
+        self.contentAlignment = contentAlignment
         self.accessory = accessory
         self.gifName = gifName
         self.autoAdvanceAfter = autoAdvanceAfter
@@ -126,6 +136,7 @@ public struct OnboardingInfoStep: Hashable {
         appearance: OnboardingAppearancePreference = .system,
         imagePlacement: OnboardingInfoImagePlacement = .top,
         accessoryPlacement: OnboardingInfoAccessoryPlacement = .afterContentBeforeCTA,
+        contentAlignment: OnboardingInfoContentAlignment = .bottom,
         autoAdvanceAfter: TimeInterval? = nil,
         @ViewBuilder accessory: () -> Accessory
     ) {
@@ -145,6 +156,7 @@ public struct OnboardingInfoStep: Hashable {
             appearance: appearance,
             imagePlacement: imagePlacement,
             accessoryPlacement: accessoryPlacement,
+            contentAlignment: contentAlignment,
             accessory: AnyView(accessory()),
             autoAdvanceAfter: autoAdvanceAfter
         )
@@ -166,6 +178,7 @@ public struct OnboardingInfoStep: Hashable {
         lhs.appearance == rhs.appearance &&
         lhs.imagePlacement == rhs.imagePlacement &&
         lhs.accessoryPlacement == rhs.accessoryPlacement &&
+        lhs.contentAlignment == rhs.contentAlignment &&
         lhs.autoAdvanceAfter == rhs.autoAdvanceAfter
     }
 
@@ -178,6 +191,7 @@ public struct OnboardingInfoStep: Hashable {
         hasher.combine(appearance)
         hasher.combine(imagePlacement)
         hasher.combine(accessoryPlacement)
+        hasher.combine(contentAlignment)
         hasher.combine(gifName)
         hasher.combine(backgroundImageName)
         hasher.combine(videoName)

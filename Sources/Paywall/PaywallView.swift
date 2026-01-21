@@ -72,6 +72,17 @@ public struct PaywallView: View {
     private var hasHeroVisual: Bool {
         configuration.heroImageName != nil || configuration.heroGIFName != nil
     }
+    private var localizationBundle: Bundle {
+        guard let code = configuration.localizationCode,
+              let path = Bundle.main.path(forResource: code, ofType: "lproj"),
+              let bundle = Bundle(path: path) else {
+            return .main
+        }
+        return bundle
+    }
+    private var localizer: PaywallLocalization {
+        PaywallLocalization(bundle: localizationBundle, table: configuration.localizationTable)
+    }
 
     public var body: some View {
         GeometryReader { geometry in
@@ -86,14 +97,15 @@ public struct PaywallView: View {
                 .scrollIndicators(.hidden)
             }
         }
+        .environment(\.paywallLocalization, localizer)
         .task {
             guard shouldLoadOfferingFromNetwork else { return }
             await loadOffering()
         }
         .onAppear(perform: startAnimations)
         .onReceive(subscriptionManager.$isPremium, perform: handlePremiumChange(_:))
-        .alert("Message", isPresented: .constant(alertMessage != nil)) {
-            Button("OK") { alertMessage = nil }
+        .alert(localized("paywall.alert.title", defaultValue: "Message"), isPresented: .constant(alertMessage != nil)) {
+            Button(localized("paywall.alert.ok", defaultValue: "OK")) { alertMessage = nil }
         } message: {
             Text(alertMessage ?? "")
         }
@@ -289,7 +301,7 @@ public struct PaywallView: View {
     @ViewBuilder
     private func pricingSection(for geometry: GeometryProxy) -> some View {
         VStack(spacing: 12) {
-            Text("Choose Your Plan")
+            Text(localized("paywall.choose_plan", defaultValue: "Choose Your Plan"))
                 .font(typography.headingLarge)
                 .foregroundColor(primaryTextColor)
                 .opacity(showFeatures ? 1 : 0)
@@ -299,7 +311,7 @@ public struct PaywallView: View {
                 VStack(spacing: 8) {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: accentColor))
-                   Text("Loading options…")
+                   Text(localized("paywall.loading_options", defaultValue: "Loading options…"))
                         .font(typography.subtitle)
                         .foregroundColor(secondaryTextColor)
                 }
@@ -308,7 +320,7 @@ public struct PaywallView: View {
                 VStack(spacing: 8) {
             if let freeTrialPackage = PaywallView.freeTrialPackage(from: offering) {
                 HStack {
-                    Text("Free Trial")
+                    Text(localized("paywall.free_trial", defaultValue: "Free Trial"))
                         .font(typography.headingLarge)
                         .foregroundColor(primaryTextColor)
 
@@ -344,7 +356,7 @@ public struct PaywallView: View {
                     }
                 }
             } else {
-                Text("No packages available right now. Please try again later.")
+                Text(localized("paywall.no_packages", defaultValue: "No packages available right now. Please try again later."))
                     .font(typography.subtitle)
                     .foregroundColor(secondaryTextColor)
                     .padding(.vertical, 12)
@@ -362,7 +374,7 @@ public struct PaywallView: View {
                         .scaleEffect(0.8)
                 }
 
-                Text(isPurchasing ? "Processing..." : ctaButtonText)
+                Text(isPurchasing ? localized("paywall.processing", defaultValue: "Processing...") : ctaButtonText)
                     .font(typography.button)
                     .foregroundColor(.white)
             }
@@ -396,9 +408,9 @@ public struct PaywallView: View {
     private func trustSection(using geometry: GeometryProxy) -> some View {
         VStack(spacing: geometry.size.height < 700 ? 8 : 12) {
             HStack(spacing: geometry.size.height < 700 ? 16 : 20) {
-                CompactTrustIndicator(icon: "lock.shield.fill", text: "Secure")
-                CompactTrustIndicator(icon: "arrow.clockwise", text: "Cancel Anytime")
-                CompactTrustIndicator(icon: "checkmark.seal.fill", text: "No Hidden Fees")
+                CompactTrustIndicator(icon: "lock.shield.fill", text: localized("paywall.trust.secure", defaultValue: "Secure"))
+                CompactTrustIndicator(icon: "arrow.clockwise", text: localized("paywall.trust.cancel_anytime", defaultValue: "Cancel Anytime"))
+                CompactTrustIndicator(icon: "checkmark.seal.fill", text: localized("paywall.trust.no_hidden_fees", defaultValue: "No Hidden Fees"))
             }
             .opacity(showFeatures ? 1 : 0)
             .animation(.easeOut(duration: 0.6).delay(1.4), value: showFeatures)
@@ -407,7 +419,7 @@ public struct PaywallView: View {
                 if configuration.privacyPolicyURL != nil || configuration.termsOfServiceURL != nil {
                     HStack(spacing: 8) {
                         if configuration.privacyPolicyURL != nil {
-                            Button("Privacy Policy") {
+                            Button(localized("paywall.privacy_policy", defaultValue: "Privacy Policy")) {
                                 openLink(configuration.privacyPolicyURL)
                             }
                             .font(typography.footnote)
@@ -415,7 +427,7 @@ public struct PaywallView: View {
                             .underline(true)
                         }
                         
-                        Button("Restore Purchases") {
+                        Button(localized("paywall.restore_purchases", defaultValue: "Restore Purchases")) {
                             restorePurchases()
                         }
                         .font(typography.footnote)
@@ -423,7 +435,7 @@ public struct PaywallView: View {
                         .underline(true)
 
                         if configuration.termsOfServiceURL != nil {
-                            Button("Terms of Service") {
+                            Button(localized("paywall.terms_of_service", defaultValue: "Terms of Service")) {
                                 openLink(configuration.termsOfServiceURL)
                             }
                             .font(typography.footnote)
@@ -448,11 +460,11 @@ public struct PaywallView: View {
     }
 
     private var ctaButtonText: String {
-        guard let selectedPackage else { return "Unlock Premium" }
+        guard let selectedPackage else { return localized("paywall.cta.unlock_premium", defaultValue: "Unlock Premium") }
         if showFreeTrial && selectedPackage.storeProduct.introductoryDiscount != nil {
-            return "Start Free Trial"
+            return localized("paywall.cta.start_free_trial", defaultValue: "Start Free Trial")
         }
-        return "Unlock Premium"
+        return localized("paywall.cta.unlock_premium", defaultValue: "Unlock Premium")
     }
 
     @MainActor
@@ -541,10 +553,14 @@ public struct PaywallView: View {
                     try? await Task.sleep(nanoseconds: 500_000_000)
                     dismiss()
                 } else {
-                    alertMessage = "No previous purchases found to restore."
+                    alertMessage = localized("paywall.alert.no_purchases", defaultValue: "No previous purchases found to restore.")
                 }
             } catch {
-                alertMessage = "Failed to restore purchases: \(error.localizedDescription)"
+                alertMessage = localizer.format(
+                    "paywall.alert.restore_failed",
+                    defaultValue: "Failed to restore purchases: %@",
+                    error.localizedDescription
+                )
             }
         }
     }
@@ -582,5 +598,9 @@ public struct PaywallView: View {
             return preferred
         }
         return nonTrialPackages.first ?? offering.availablePackages.first
+    }
+
+    private func localized(_ key: String, defaultValue: String) -> String {
+        localizer.string(key, defaultValue: defaultValue)
     }
 }

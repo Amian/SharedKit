@@ -17,21 +17,37 @@ struct OnboardingReviewView: View {
         ZStack {
             backgroundView
 
-            VStack(spacing: 24) {
-                content
-                    .frame(maxWidth: 480, maxHeight: .infinity)
-                    .padding(.horizontal, 24)
-                    .padding(.top, 12)
-
-                primaryButton
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 24)
-            }
+            content
+                .frame(maxWidth: 480)
+                .padding(.horizontal, 24)
         }
         .preferredColorScheme(step.appearance.preferredColorScheme)
     }
 
     private var content: some View {
+        Group {
+            if step.backgroundImageName != nil {
+                VStack(spacing: 24) {
+                    Spacer(minLength: 0)
+                    contentStack
+                    primaryButton
+                        .padding(.bottom, 24)
+                }
+                .frame(maxHeight: .infinity, alignment: .bottom)
+            } else {
+                VStack(spacing: 24) {
+                    contentStack
+                        .frame(maxHeight: .infinity)
+                    primaryButton
+                        .padding(.bottom, 24)
+                }
+                .frame(maxHeight: .infinity)
+            }
+        }
+        .padding(.top, 12)
+    }
+
+    private var contentStack: some View {
         VStack(spacing: 16) {
             imageView
 
@@ -100,7 +116,7 @@ struct OnboardingReviewView: View {
                 Image(imageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
             }
         }
@@ -120,13 +136,8 @@ struct OnboardingReviewView: View {
 
     private var backgroundView: some View {
         Group {
-            if let imageName = step.backgroundImageName {
-                ZStack {
-                    step.backgroundColor
-                    Image(imageName)
-                        .resizable()
-                        .scaledToFill()
-                }
+            if step.backgroundImageName != nil {
+                Color.clear
             } else {
                 step.backgroundColor
             }

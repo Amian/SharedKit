@@ -6,6 +6,7 @@ import DesignSystem
 struct CompactPremiumPackageCard: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.designTypography) private var typography
+    @Environment(\.paywallLocalization) private var paywallLocalization
 
     let package: Package
     let isSelected: Bool
@@ -26,9 +27,9 @@ struct CompactPremiumPackageCard: View {
     private var savings: String? {
         switch package.packageType {
         case .annual:
-            return "Save 60%"
+            return paywallLocalization.string("paywall.package.save_60", defaultValue: "Save 60%")
         case .sixMonth:
-            return "Save 40%"
+            return paywallLocalization.string("paywall.package.save_40", defaultValue: "Save 40%")
         default:
             return nil
         }
@@ -41,23 +42,23 @@ struct CompactPremiumPackageCard: View {
     private var defaultSubtitle: String {
         switch package.packageType {
         case .monthly:
-            return "Billed monthly"
+            return paywallLocalization.string("paywall.package.billed_monthly", defaultValue: "Billed monthly")
         case .annual:
-            return "Billed annually"
+            return paywallLocalization.string("paywall.package.billed_annually", defaultValue: "Billed annually")
         case .sixMonth:
-            return "Billed every 6 months"
+            return paywallLocalization.string("paywall.package.billed_every_6_months", defaultValue: "Billed every 6 months")
         case .threeMonth:
-            return "Billed quarterly"
+            return paywallLocalization.string("paywall.package.billed_quarterly", defaultValue: "Billed quarterly")
         case .twoMonth:
-            return "Billed every 2 months"
+            return paywallLocalization.string("paywall.package.billed_every_2_months", defaultValue: "Billed every 2 months")
         case .weekly:
-            return "Billed weekly"
+            return paywallLocalization.string("paywall.package.billed_weekly", defaultValue: "Billed weekly")
         case .lifetime:
-            return "One-time purchase"
+            return paywallLocalization.string("paywall.package.one_time", defaultValue: "One-time purchase")
         case .custom:
-            return "Special offer"
+            return paywallLocalization.string("paywall.package.special_offer", defaultValue: "Special offer")
         case .unknown:
-            return "Limited time offer"
+            return paywallLocalization.string("paywall.package.limited_offer", defaultValue: "Limited time offer")
         }
     }
 
@@ -94,7 +95,7 @@ struct CompactPremiumPackageCard: View {
                         .foregroundColor(primaryTextColor)
 
                     if package.packageType != .monthly {
-                        Text("per year")
+                        Text(paywallLocalization.string("paywall.package.per_year", defaultValue: "per year"))
                             .font(typography.emphasisSecondary)
                             .foregroundColor(secondaryTextColor)
                     }
@@ -133,19 +134,19 @@ struct CompactPremiumPackageCard: View {
     private var priceDescription: String {
         switch package.packageType {
         case .monthly:
-            return "Billed monthly"
+            return paywallLocalization.string("paywall.package.billed_monthly", defaultValue: "Billed monthly")
         case .annual:
-            return "Billed annually"
+            return paywallLocalization.string("paywall.package.billed_annually", defaultValue: "Billed annually")
         case .sixMonth:
-            return "Billed every 6 months"
+            return paywallLocalization.string("paywall.package.billed_every_6_months", defaultValue: "Billed every 6 months")
         case .twoMonth:
-            return "Billed every 2 months"
+            return paywallLocalization.string("paywall.package.billed_every_2_months", defaultValue: "Billed every 2 months")
         case .threeMonth:
-            return "Billed quarterly"
+            return paywallLocalization.string("paywall.package.billed_quarterly", defaultValue: "Billed quarterly")
         case .weekly:
-            return "Billed weekly"
+            return paywallLocalization.string("paywall.package.billed_weekly", defaultValue: "Billed weekly")
         default:
-            return "One-time purchase"
+            return paywallLocalization.string("paywall.package.one_time", defaultValue: "One-time purchase")
         }
     }
 }
@@ -154,6 +155,7 @@ struct CompactPremiumPackageCard: View {
 struct UltraCompactPackageCard: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.designTypography) private var typography
+    @Environment(\.paywallLocalization) private var paywallLocalization
 
     let package: Package
     let isSelected: Bool
@@ -176,9 +178,9 @@ struct UltraCompactPackageCard: View {
     private var savings: String? {
         switch package.packageType {
         case .annual:
-            return "Save 60%"
+            return paywallLocalization.string("paywall.package.save_60", defaultValue: "Save 60%")
         case .sixMonth:
-            return "Save 40%"
+            return paywallLocalization.string("paywall.package.save_40", defaultValue: "Save 40%")
         default:
             return nil
         }
@@ -191,23 +193,23 @@ struct UltraCompactPackageCard: View {
     private var defaultSubtitle: String {
         switch package.packageType {
         case .monthly:
-            return "Billed monthly"
+            return paywallLocalization.string("paywall.package.billed_monthly", defaultValue: "Billed monthly")
         case .annual:
-            return "Billed annually"
+            return paywallLocalization.string("paywall.package.billed_annually", defaultValue: "Billed annually")
         case .sixMonth:
-            return "Billed every 6 months"
+            return paywallLocalization.string("paywall.package.billed_every_6_months", defaultValue: "Billed every 6 months")
         case .threeMonth:
-            return "Billed quarterly"
+            return paywallLocalization.string("paywall.package.billed_quarterly", defaultValue: "Billed quarterly")
         case .twoMonth:
-            return "Billed every 2 months"
+            return paywallLocalization.string("paywall.package.billed_every_2_months", defaultValue: "Billed every 2 months")
         case .weekly:
-            return "Billed weekly"
+            return paywallLocalization.string("paywall.package.billed_weekly", defaultValue: "Billed weekly")
         case .lifetime:
-            return "One-time purchase"
+            return paywallLocalization.string("paywall.package.one_time", defaultValue: "One-time purchase")
         case .custom:
-            return "Special offer"
+            return paywallLocalization.string("paywall.package.special_offer", defaultValue: "Special offer")
         case .unknown:
-            return "Limited time offer"
+            return paywallLocalization.string("paywall.package.limited_offer", defaultValue: "Limited time offer")
         }
     }
 
@@ -255,7 +257,7 @@ struct UltraCompactPackageCard: View {
                             .foregroundColor(.gray)
                             .strikethrough()
 
-                        Text("FREE")
+                        Text(paywallLocalization.string("paywall.package.free", defaultValue: "FREE"))
                             .font(typography.emphasisPrimary)
                             .foregroundColor(.green)
                     } else {
@@ -304,23 +306,48 @@ struct UltraCompactPackageCard: View {
         let periodUnit = introDiscount.subscriptionPeriod.unit
         let periodValue = introDiscount.subscriptionPeriod.value
 
-        let durationText: String
-        switch periodUnit {
-        case .day:
-            durationText = periodValue == 1 ? "1 day" : "\(periodValue) days"
-        case .week:
-            durationText = periodValue == 1 ? "1 week" : "\(periodValue) weeks"
-        case .month:
-            durationText = periodValue == 1 ? "1 month" : "\(periodValue) months"
-        case .year:
-            durationText = periodValue == 1 ? "1 year" : "\(periodValue) years"
-        @unknown default:
-            durationText = "trial period"
-        }
+        let durationText = localizedDurationText(unit: periodUnit, value: periodValue)
 
         let regularPrice = package.storeProduct.localizedPriceString
-        let billingPeriod = package.packageType == .weekly ? "/week" : "/month"
+        let billingPeriodKey = package.packageType == .weekly
+            ? "paywall.package.billing_period.week"
+            : "paywall.package.billing_period.month"
+        let billingPeriodDefault = package.packageType == .weekly ? "/week" : "/month"
+        let billingPeriod = paywallLocalization.string(billingPeriodKey, defaultValue: billingPeriodDefault)
 
-        return "Free for \(durationText), then \(regularPrice)\(billingPeriod)"
+        return paywallLocalization.format(
+            "paywall.package.free_for_then",
+            defaultValue: "Free for %@, then %@%@",
+            durationText,
+            regularPrice,
+            billingPeriod
+        )
+    }
+
+    private func localizedDurationText(unit: SubscriptionPeriod.Unit, value: Int) -> String {
+        switch unit {
+        case .day:
+            if value == 1 {
+                return paywallLocalization.string("paywall.package.duration.day_one", defaultValue: "1 day")
+            }
+            return paywallLocalization.format("paywall.package.duration.day_other", defaultValue: "%d days", value)
+        case .week:
+            if value == 1 {
+                return paywallLocalization.string("paywall.package.duration.week_one", defaultValue: "1 week")
+            }
+            return paywallLocalization.format("paywall.package.duration.week_other", defaultValue: "%d weeks", value)
+        case .month:
+            if value == 1 {
+                return paywallLocalization.string("paywall.package.duration.month_one", defaultValue: "1 month")
+            }
+            return paywallLocalization.format("paywall.package.duration.month_other", defaultValue: "%d months", value)
+        case .year:
+            if value == 1 {
+                return paywallLocalization.string("paywall.package.duration.year_one", defaultValue: "1 year")
+            }
+            return paywallLocalization.format("paywall.package.duration.year_other", defaultValue: "%d years", value)
+        @unknown default:
+            return paywallLocalization.string("paywall.package.trial_period", defaultValue: "trial period")
+        }
     }
 }

@@ -24,7 +24,9 @@ struct OnboardingInfoView: View {
         Group {
             if step.backgroundImageName != nil {
                 VStack(spacing: 24) {
-                    Spacer(minLength: 0)
+                    if step.contentAlignment == .bottom {
+                        Spacer(minLength: 0)
+                    }
                     contentStack
                     if step.accessoryPlacement == .afterContentBeforeCTA {
                         accessoryView
@@ -34,7 +36,7 @@ struct OnboardingInfoView: View {
                             .padding(.bottom, 24)
                     }
                 }
-                .frame(maxHeight: .infinity, alignment: .bottom)
+                .frame(maxHeight: .infinity, alignment: contentAlignment)
             } else {
                 VStack(spacing: 24) {
                     contentStack
@@ -52,7 +54,7 @@ struct OnboardingInfoView: View {
                 .frame(maxHeight: .infinity)
             }
         }
-        .padding(.top, 12)
+        .padding(.top, topPadding)
         .task(id: step) {
             guard let delay = step.autoAdvanceAfter else { return }
             let nanoseconds = UInt64(delay * 1_000_000_000)
@@ -77,6 +79,28 @@ struct OnboardingInfoView: View {
         step.subtitleColor ?? (resolvedScheme == .dark
             ? Color.white.opacity(0.75)
             : Color(red: 71/255, green: 85/255, blue: 105/255))
+    }
+
+    private var hasVideo: Bool {
+        step.videoName != nil
+    }
+
+    private var topPadding: CGFloat {
+        if hasVideo {
+            return 4
+        }
+        return step.contentAlignment == .center ? 0 : 12
+    }
+
+    private var contentAlignment: Alignment {
+        switch step.contentAlignment {
+        case .top:
+            return .top
+        case .center:
+            return .center
+        case .bottom:
+            return .bottom
+        }
     }
 
     private var primaryButton: some View {
@@ -185,10 +209,16 @@ struct OnboardingInfoView: View {
     @ViewBuilder
     private var imageView: some View {
         if let videoName = step.videoName, let url = videoURL(for: videoName) {
+            let cornerRadius: CGFloat = 20
             LoopingVideoView(url: url)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.vertical, 12)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                        .stroke(Color.black.opacity(0.7), lineWidth: 2)
+                )
+                .padding(.top, 4)
+                .padding(.bottom, 12)
         } else if let gifName = step.gifName {
             AnimatedGIFView(resourceName: gifName)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

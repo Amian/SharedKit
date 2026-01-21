@@ -32,6 +32,8 @@ public struct PaywallConfiguration: Hashable {
     public var heroImageName: String?
     public var heroGIFName: String?
     public var heroImageStyle: HeroImageStyle
+    public var localizationCode: String?
+    public var localizationTable: String
 
     public init(
         revenueCatPublicKey: String,
@@ -45,7 +47,9 @@ public struct PaywallConfiguration: Hashable {
         subheadline: String = "Unlock your full potential with complete access",
         heroImageName: String? = nil,
         heroGIFName: String? = nil,
-        heroImageStyle: HeroImageStyle = .contained
+        heroImageStyle: HeroImageStyle = .contained,
+        localizationCode: String? = nil,
+        localizationTable: String = "Localizable"
     ) {
         self.revenueCatPublicKey = revenueCatPublicKey
         self.offeringIdentifier = offeringIdentifier
@@ -59,5 +63,7 @@ public struct PaywallConfiguration: Hashable {
         self.heroImageName = heroImageName
         self.heroGIFName = heroGIFName
         self.heroImageStyle = heroImageStyle
+        self.localizationCode = localizationCode
+        self.localizationTable = localizationTable
     }
 }
