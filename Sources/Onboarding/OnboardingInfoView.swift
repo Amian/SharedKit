@@ -4,10 +4,12 @@ import DesignSystem
 @available(iOS 17.0, macOS 11.0, *)
 struct OnboardingInfoView: View {
     let step: OnboardingInfoStep
-    let action: () -> Void
+    let onPrimaryAction: (_ stopLoading: @escaping () -> Void) -> Void
+    let onAutoAdvance: () -> Void
 
     @Environment(\.colorScheme) private var systemScheme
     @Environment(\.designTypography) private var typography
+    @State private var isPerformingPrimaryAction = false
 
     var body: some View {
         ZStack {
@@ -60,7 +62,7 @@ struct OnboardingInfoView: View {
             let nanoseconds = UInt64(delay * 1_000_000_000)
             try? await Task.sleep(nanoseconds: nanoseconds)
             await MainActor.run {
-                action()
+                onAutoAdvance()
             }
         }
     }
@@ -104,18 +106,37 @@ struct OnboardingInfoView: View {
     }
 
     private var primaryButton: some View {
-        Button(action: action) {
-            Text(step.ctaTitle)
-                .font(typography.button)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(accentGradient)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .shadow(color: step.accentColor.opacity(0.3), radius: 18, x: 0, y: 10)
-                .padding(.horizontal, 4)
+        Button {
+            if step.showsCTALoadingIndicator {
+                guard isPerformingPrimaryAction == false else { return }
+                isPerformingPrimaryAction = true
+            }
+            onPrimaryAction {
+                if step.showsCTALoadingIndicator {
+                    isPerformingPrimaryAction = false
+                }
+            }
+        } label: {
+            Group {
+                if step.showsCTALoadingIndicator && isPerformingPrimaryAction {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .tint(.white)
+                } else {
+                    Text(step.ctaTitle)
+                        .font(typography.button)
+                }
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(accentGradient)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .shadow(color: step.accentColor.opacity(0.3), radius: 18, x: 0, y: 10)
+            .padding(.horizontal, 4)
         }
         .buttonStyle(.plain)
+        .disabled(step.showsCTALoadingIndicator && isPerformingPrimaryAction)
     }
 
     private var accentGradient: LinearGradient {

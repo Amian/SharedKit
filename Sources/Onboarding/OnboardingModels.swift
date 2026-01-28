@@ -69,6 +69,7 @@ public struct OnboardingInfoStep: Hashable {
     public var subtitle: String?
     public var ctaTitle: String
     public var showsCTA: Bool
+    public var showsCTALoadingIndicator: Bool
     public var accentColor: Color
     public var backgroundColor: Color
     public var titleColor: Color?
@@ -89,6 +90,7 @@ public struct OnboardingInfoStep: Hashable {
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
         showsCTA: Bool = true,
+        showsCTALoadingIndicator: Bool = false,
         accentColor: Color = Color.green,
         backgroundColor: Color = .designSystemBackground,
         titleColor: Color? = nil,
@@ -107,6 +109,7 @@ public struct OnboardingInfoStep: Hashable {
         self.subtitle = subtitle
         self.ctaTitle = ctaTitle
         self.showsCTA = showsCTA
+        self.showsCTALoadingIndicator = showsCTALoadingIndicator
         self.accentColor = accentColor
         self.backgroundColor = backgroundColor
         self.titleColor = titleColor
@@ -129,6 +132,7 @@ public struct OnboardingInfoStep: Hashable {
         subtitle: String? = nil,
         ctaTitle: String = "Continue",
         showsCTA: Bool = true,
+        showsCTALoadingIndicator: Bool = false,
         accentColor: Color = Color.green,
         backgroundColor: Color = .designSystemBackground,
         titleColor: Color? = nil,
@@ -149,6 +153,7 @@ public struct OnboardingInfoStep: Hashable {
             subtitle: subtitle,
             ctaTitle: ctaTitle,
             showsCTA: showsCTA,
+            showsCTALoadingIndicator: showsCTALoadingIndicator,
             accentColor: accentColor,
             backgroundColor: backgroundColor,
             titleColor: titleColor,
@@ -171,6 +176,7 @@ public struct OnboardingInfoStep: Hashable {
         lhs.subtitle == rhs.subtitle &&
         lhs.ctaTitle == rhs.ctaTitle &&
         lhs.showsCTA == rhs.showsCTA &&
+        lhs.showsCTALoadingIndicator == rhs.showsCTALoadingIndicator &&
         lhs.accentColor == rhs.accentColor &&
         lhs.backgroundColor == rhs.backgroundColor &&
         lhs.titleColor == rhs.titleColor &&
@@ -188,6 +194,7 @@ public struct OnboardingInfoStep: Hashable {
         hasher.combine(subtitle)
         hasher.combine(ctaTitle)
         hasher.combine(showsCTA)
+        hasher.combine(showsCTALoadingIndicator)
         hasher.combine(appearance)
         hasher.combine(imagePlacement)
         hasher.combine(accessoryPlacement)

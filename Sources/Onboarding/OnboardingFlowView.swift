@@ -8,6 +8,7 @@ public struct OnboardingFlowView: View {
     let onFinish: (_ responses: [OnboardingResponse]) -> Void
     let onStepChange: ((Int) -> Void)?
     let configuration: OnboardingFlowConfiguration
+    let onInfoStepPrimaryAction: ((OnboardingInfoStep, @escaping () -> Void) -> Void)?
 
     @State private var currentIndex: Int = 0
     @State private var selections: [Int: Set<UUID>] = [:]
@@ -18,19 +19,22 @@ public struct OnboardingFlowView: View {
         reviewInsertionIndex: Int? = nil,
         onFinish: @escaping (_ responses: [OnboardingResponse]) -> Void,
         onStepChange: ((Int) -> Void)? = nil,
-        configuration: OnboardingFlowConfiguration = OnboardingFlowConfiguration()
+        configuration: OnboardingFlowConfiguration = OnboardingFlowConfiguration(),
+        onInfoStepPrimaryAction: ((OnboardingInfoStep, @escaping () -> Void) -> Void)? = nil
     ) {
         self.steps = Self.insert(reviewStep, into: steps, at: reviewInsertionIndex)
         self.onFinish = onFinish
         self.onStepChange = onStepChange
         self.configuration = configuration
+        self.onInfoStepPrimaryAction = onInfoStepPrimaryAction
     }
 
     public init(
         steps: [OnboardingStep],
         onFinish: @escaping (_ responses: [OnboardingResponse]) -> Void,
         onStepChange: ((Int) -> Void)? = nil,
-        configuration: OnboardingFlowConfiguration = OnboardingFlowConfiguration()
+        configuration: OnboardingFlowConfiguration = OnboardingFlowConfiguration(),
+        onInfoStepPrimaryAction: ((OnboardingInfoStep, @escaping () -> Void) -> Void)? = nil
     ) {
         self.init(
             steps: steps,
@@ -38,7 +42,8 @@ public struct OnboardingFlowView: View {
             reviewInsertionIndex: nil,
             onFinish: onFinish,
             onStepChange: onStepChange,
-            configuration: configuration
+            configuration: configuration,
+            onInfoStepPrimaryAction: onInfoStepPrimaryAction
         )
     }
 
@@ -67,9 +72,23 @@ public struct OnboardingFlowView: View {
         Group {
             switch step {
             case .info(let info):
-                OnboardingInfoView(step: info) {
-                    advance()
-                }
+                OnboardingInfoView(
+                    step: info,
+                    onPrimaryAction: { stopLoading in
+                        if let onInfoStepPrimaryAction {
+                            onInfoStepPrimaryAction(info) {
+                                stopLoading()
+                                advance()
+                            }
+                        } else {
+                            stopLoading()
+                            advance()
+                        }
+                    },
+                    onAutoAdvance: {
+                        advance()
+                    }
+                )
             case .question(let question):
                 OnboardingQuestionView(
                     step: question,
