@@ -25,10 +25,6 @@ let package = Package(
             name: "Onboarding",
             targets: ["Onboarding"]
         ),
-        .library(
-            name: "MetaAdsKit",
-            targets: ["MetaAdsKit"]
-        ),
     ],
     dependencies: [
         .package(
@@ -38,10 +34,6 @@ let package = Package(
         .package(
             url: "https://github.com/firebase/firebase-ios-sdk.git",
             from: "11.2.0"
-        ),
-        .package(
-            url: "https://github.com/facebook/facebook-ios-sdk.git",
-            from: "18.0.0"
         ),
     ],
     targets: [
@@ -68,12 +60,6 @@ let package = Package(
             name: "Onboarding",
             dependencies: [
                 "DesignSystem"
-            ]
-        ),
-        .target(
-            name: "MetaAdsKit",
-            dependencies: [
-                .product(name: "FacebookCore", package: "facebook-ios-sdk"),
             ]
         ),
         .target(

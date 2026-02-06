@@ -7,17 +7,27 @@ struct OnboardingInfoView: View {
     let onPrimaryAction: (_ stopLoading: @escaping () -> Void) -> Void
     let onAutoAdvance: () -> Void
 
+    private let coordinateSpaceName = "OnboardingInfoView"
+
     @Environment(\.colorScheme) private var systemScheme
     @Environment(\.designTypography) private var typography
     @State private var isPerformingPrimaryAction = false
+    @State private var textBounds = OnboardingTextBounds(title: nil, subtitle: nil)
+    @State private var containerSize: CGSize = .zero
 
     var body: some View {
         ZStack {
             backgroundView
+            textGradientOverlay
 
             content
                 .frame(maxWidth: 480)
                 .padding(.horizontal, 24)
+        }
+        .coordinateSpace(name: coordinateSpaceName)
+        .background(containerSizeReader)
+        .onPreferenceChange(OnboardingTextBoundsPreferenceKey.self) { bounds in
+            textBounds = bounds
         }
         .preferredColorScheme(step.appearance.preferredColorScheme)
     }
@@ -69,6 +79,64 @@ struct OnboardingInfoView: View {
 
     private var resolvedScheme: ColorScheme {
         step.appearance.preferredColorScheme ?? systemScheme
+    }
+
+    private var textGradientOverlay: some View {
+        Group {
+            if step.backgroundImageName != nil,
+               let edge = gradientEdge,
+               let boundary = gradientBoundaryY {
+                OnboardingTextGradientOverlay(
+                    textBoundaryY: boundary,
+                    containerHeight: containerSize.height,
+                    edge: edge,
+                    baseColor: gradientBaseColor,
+                    maxOpacity: textGradientMaxOpacity,
+                    edgePadding: textGradientEdgePadding,
+                    opaqueStop: textGradientOpaqueStop
+                )
+            }
+        }
+    }
+
+    private var gradientEdge: OnboardingTextGradientEdge? {
+        switch step.contentAlignment {
+        case .top:
+            return .top
+        case .bottom:
+            return .bottom
+        case .center:
+            return nil
+        }
+    }
+
+    private var gradientBoundaryY: CGFloat? {
+        switch step.contentAlignment {
+        case .top:
+            return textBounds.subtitle?.maxY ?? textBounds.title?.maxY
+        case .bottom:
+            return textBounds.title?.minY ?? textBounds.subtitle?.minY
+        case .center:
+            return nil
+        }
+    }
+
+    private var gradientBaseColor: Color {
+        let referenceColor: Color = step.title.isEmpty ? subtitleColor : titleColor
+        let isLight = referenceColor.isPerceivedLight(resolvedFor: resolvedScheme)
+        return isLight ? Color.black : Color.white
+    }
+
+    private var textGradientMaxOpacity: CGFloat {
+        1.0
+    }
+
+    private var textGradientEdgePadding: CGFloat {
+        96
+    }
+
+    private var textGradientOpaqueStop: CGFloat {
+        0.45
     }
 
     private var titleColor: Color {
@@ -160,6 +228,18 @@ struct OnboardingInfoView: View {
         .ignoresSafeArea()
     }
 
+    private var containerSizeReader: some View {
+        GeometryReader { proxy in
+            Color.clear
+                .onAppear {
+                    containerSize = proxy.size
+                }
+                .onChange(of: proxy.size) { newSize in
+                    containerSize = newSize
+                }
+        }
+    }
+
     private var lightBackgroundColors: [Color] {
         [
             Color(red: 248/255, green: 250/255, blue: 252/255),
@@ -212,6 +292,7 @@ struct OnboardingInfoView: View {
                 .foregroundColor(titleColor)
                 .multilineTextAlignment(.center)
                 .lineSpacing(6)
+                .onboardingTitleBounds(in: coordinateSpaceName)
         }
     }
 
@@ -224,6 +305,7 @@ struct OnboardingInfoView: View {
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
                 .padding(.horizontal, 24)
+                .onboardingSubtitleBounds(in: coordinateSpaceName)
         }
     }
 

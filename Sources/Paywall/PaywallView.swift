@@ -66,6 +66,9 @@ public struct PaywallView: View {
     private var chipBackgroundColor: Color {
         resolvedColorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05)
     }
+    private var closeButtonBackgroundColor: Color {
+        resolvedColorScheme == .dark ? Color.white.opacity(0.22) : Color.black.opacity(0.1)
+    }
     private var shouldUseEdgeToEdgeHero: Bool {
         configuration.heroImageStyle == .edgeToEdge && configuration.heroImageName != nil
     }
@@ -227,10 +230,12 @@ public struct PaywallView: View {
         Button(action: { dismiss() }) {
             Image(systemName: "xmark")
                 .font(.system(size: 16, weight: .medium))
-                .foregroundColor(secondaryTextColor)
+                .foregroundColor(Color.gray)
                 .frame(width: 32, height: 32)
-                .background(chipBackgroundColor)
-                .clipShape(Circle())
+                .background(
+                    Circle()
+                        .stroke(Color.gray.opacity(0.6), lineWidth: 1)
+                )
         }
     }
 

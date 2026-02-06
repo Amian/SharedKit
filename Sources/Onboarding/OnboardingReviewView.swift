@@ -10,16 +10,27 @@ struct OnboardingReviewView: View {
     let step: OnboardingReviewStep
     let onAdvance: () -> Void
 
+    private let coordinateSpaceName = "OnboardingReviewView"
+
+    @Environment(\.colorScheme) private var systemScheme
     @Environment(\.designTypography) private var typography
     @State private var isRequestingReview = false
+    @State private var textBounds = OnboardingTextBounds(title: nil, subtitle: nil)
+    @State private var containerSize: CGSize = .zero
 
     var body: some View {
         ZStack {
             backgroundView
+            textGradientOverlay
 
             content
                 .frame(maxWidth: 480)
                 .padding(.horizontal, 24)
+        }
+        .coordinateSpace(name: coordinateSpaceName)
+        .background(containerSizeReader)
+        .onPreferenceChange(OnboardingTextBoundsPreferenceKey.self) { bounds in
+            textBounds = bounds
         }
         .preferredColorScheme(step.appearance.preferredColorScheme)
     }
@@ -47,6 +58,49 @@ struct OnboardingReviewView: View {
         .padding(.top, 12)
     }
 
+    private var resolvedScheme: ColorScheme {
+        step.appearance.preferredColorScheme ?? systemScheme
+    }
+
+    private var textGradientOverlay: some View {
+        Group {
+            if step.backgroundImageName != nil,
+               let boundary = gradientBoundaryY {
+                OnboardingTextGradientOverlay(
+                    textBoundaryY: boundary,
+                    containerHeight: containerSize.height,
+                    edge: .bottom,
+                    baseColor: gradientBaseColor,
+                    maxOpacity: textGradientMaxOpacity,
+                    edgePadding: textGradientEdgePadding,
+                    opaqueStop: textGradientOpaqueStop
+                )
+            }
+        }
+    }
+
+    private var gradientBoundaryY: CGFloat? {
+        textBounds.title?.minY ?? textBounds.subtitle?.minY
+    }
+
+    private var gradientBaseColor: Color {
+        let referenceColor: Color = step.title.isEmpty ? subtitleColor : titleColor
+        let isLight = referenceColor.isPerceivedLight(resolvedFor: resolvedScheme)
+        return isLight ? Color.black : Color.white
+    }
+
+    private var textGradientMaxOpacity: CGFloat {
+        1.0
+    }
+
+    private var textGradientEdgePadding: CGFloat {
+        96
+    }
+
+    private var textGradientOpaqueStop: CGFloat {
+        0.45
+    }
+
     private var contentStack: some View {
         VStack(spacing: 16) {
             imageView
@@ -56,6 +110,7 @@ struct OnboardingReviewView: View {
                     .font(typography.title)
                     .multilineTextAlignment(.center)
                     .foregroundColor(titleColor)
+                    .onboardingTitleBounds(in: coordinateSpaceName)
 
                 if let subtitle = step.subtitle {
                     Text(subtitle)
@@ -64,6 +119,7 @@ struct OnboardingReviewView: View {
                         .multilineTextAlignment(.center)
                         .lineSpacing(4)
                         .padding(.horizontal, 12)
+                        .onboardingSubtitleBounds(in: coordinateSpaceName)
                 }
             }
         }
@@ -143,6 +199,18 @@ struct OnboardingReviewView: View {
             }
         }
         .ignoresSafeArea()
+    }
+
+    private var containerSizeReader: some View {
+        GeometryReader { proxy in
+            Color.clear
+                .onAppear {
+                    containerSize = proxy.size
+                }
+                .onChange(of: proxy.size) { newSize in
+                    containerSize = newSize
+                }
+        }
     }
 
     private func requestReview() {
