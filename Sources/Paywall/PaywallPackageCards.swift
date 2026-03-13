@@ -39,7 +39,7 @@ struct CompactPremiumPackageCard: View {
         return savings?.uppercased()
     }
 
-    private var defaultSubtitle: String {
+    private var defaultSubtitle: String? {
         switch package.packageType {
         case .monthly:
             return paywallLocalization.string("paywall.package.billed_monthly", defaultValue: "Billed monthly")
@@ -56,7 +56,7 @@ struct CompactPremiumPackageCard: View {
         case .lifetime:
             return paywallLocalization.string("paywall.package.one_time", defaultValue: "One-time purchase")
         case .custom:
-            return paywallLocalization.string("paywall.package.special_offer", defaultValue: "Special offer")
+            return paywallLocalization.optionalString("paywall.package.special_offer")
         case .unknown:
             return paywallLocalization.string("paywall.package.limited_offer", defaultValue: "Limited time offer")
         }
@@ -82,9 +82,11 @@ struct CompactPremiumPackageCard: View {
                         }
                     }
 
-                    Text(priceDescription)
-                        .font(typography.subtitle)
-                        .foregroundColor(secondaryTextColor)
+                    if let defaultSubtitle {
+                        Text(defaultSubtitle)
+                            .font(typography.subtitle)
+                            .foregroundColor(secondaryTextColor)
+                    }
                 }
 
                 Spacer()
@@ -190,7 +192,7 @@ struct UltraCompactPackageCard: View {
         return savings?.uppercased()
     }
 
-    private var defaultSubtitle: String {
+    private var defaultSubtitle: String? {
         switch package.packageType {
         case .monthly:
             return paywallLocalization.string("paywall.package.billed_monthly", defaultValue: "Billed monthly")
@@ -207,7 +209,7 @@ struct UltraCompactPackageCard: View {
         case .lifetime:
             return paywallLocalization.string("paywall.package.one_time", defaultValue: "One-time purchase")
         case .custom:
-            return paywallLocalization.string("paywall.package.special_offer", defaultValue: "Special offer")
+            return paywallLocalization.optionalString("paywall.package.special_offer")
         case .unknown:
             return paywallLocalization.string("paywall.package.limited_offer", defaultValue: "Limited time offer")
         }
@@ -239,7 +241,7 @@ struct UltraCompactPackageCard: View {
                             .foregroundColor(secondaryTextColor)
                             .lineLimit(2)
                             .multilineTextAlignment(.leading)
-                    } else {
+                    } else if let defaultSubtitle {
                         Text(defaultSubtitle)
                             .font(typography.subtitle)
                             .foregroundColor(secondaryTextColor)

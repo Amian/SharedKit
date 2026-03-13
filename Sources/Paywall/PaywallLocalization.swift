@@ -18,6 +18,11 @@ struct PaywallLocalization: Hashable {
         bundle.localizedString(forKey: key, value: defaultValue, table: table)
     }
 
+    func optionalString(_ key: String) -> String? {
+        let localized = bundle.localizedString(forKey: key, value: nil, table: table)
+        return localized == key ? nil : localized
+    }
+
     func format(_ key: String, defaultValue: String, _ arguments: CVarArg...) -> String {
         let format = string(key, defaultValue: defaultValue)
         return String(format: format, locale: .current, arguments: arguments)
