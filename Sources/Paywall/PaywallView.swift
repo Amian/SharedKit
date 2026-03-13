@@ -1,6 +1,7 @@
 import SwiftUI
 import RevenueCat
 import DesignSystem
+import UserNotifications
 
 @available(iOS 17.0, macOS 11.0, *)
 public struct PaywallView: View {
@@ -18,7 +19,7 @@ public struct PaywallView: View {
     @State private var offering: Offering?
     @State private var isPurchasing = false
     @State private var showFeatures = false
-    @State private var showFreeTrial = false
+    @State private var remindBeforeTrialEnds = false
     @State private var showCloseButton = false
     @StateObject private var subscriptionManager = SubscriptionManager.shared
     
@@ -40,8 +41,8 @@ public struct PaywallView: View {
 
         let initialSelection = PaywallView.initialSelection(from: previewOffering)
         self._offering = State(initialValue: previewOffering)
-        self._selectedPackage = State(initialValue: initialSelection.selected)
-        self._showFreeTrial = State(initialValue: initialSelection.showFreeTrial)
+        self._selectedPackage = State(initialValue: initialSelection)
+        self._remindBeforeTrialEnds = State(initialValue: false)
         self._isLoading = State(initialValue: shouldLoad)
     }
 
@@ -65,9 +66,6 @@ public struct PaywallView: View {
     }
     private var chipBackgroundColor: Color {
         resolvedColorScheme == .dark ? Color.white.opacity(0.1) : Color.black.opacity(0.05)
-    }
-    private var closeButtonBackgroundColor: Color {
-        resolvedColorScheme == .dark ? Color.white.opacity(0.22) : Color.black.opacity(0.1)
     }
     private var shouldUseEdgeToEdgeHero: Bool {
         configuration.heroImageStyle == .edgeToEdge && configuration.heroImageName != nil
@@ -229,14 +227,12 @@ public struct PaywallView: View {
     private var closeButton: some View {
         Button(action: { dismiss() }) {
             Image(systemName: "xmark")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(Color.gray)
-                .frame(width: 32, height: 32)
-                .background(
-                    Circle()
-                        .stroke(Color.gray.opacity(0.6), lineWidth: 1)
-                )
+                .font(.system(size: 14, weight: .black))
+                .foregroundColor(.white)
+                .frame(width: 36, height: 36)
+                .background(Color.black, in: Circle())
         }
+        .buttonStyle(.plain)
     }
 
     @ViewBuilder
@@ -316,35 +312,13 @@ public struct PaywallView: View {
                 VStack(spacing: 8) {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: accentColor))
-                   Text(localized("paywall.loading_options", defaultValue: "Loading options…"))
+                    Text(localized("paywall.loading_options", defaultValue: "Loading options…"))
                         .font(typography.subtitle)
                         .foregroundColor(secondaryTextColor)
                 }
                 .padding(.vertical, 16)
             } else if let offering {
                 VStack(spacing: 8) {
-            if let freeTrialPackage = PaywallView.freeTrialPackage(from: offering) {
-                HStack {
-                    Text(localized("paywall.free_trial", defaultValue: "Free Trial"))
-                        .font(typography.headingLarge)
-                        .foregroundColor(primaryTextColor)
-
-                    Spacer()
-                    
-                    Toggle("", isOn: $showFreeTrial)
-                        .labelsHidden()
-                        .toggleStyle(SwitchToggleStyle(tint: accentColor))
-                        .scaleEffect(0.8)
-                        .frame(width: 44, alignment: .trailing)
-                        .onChange(of: showFreeTrial) { _, newValue in
-                            handleFreeTrialToggle(newValue: newValue)
-                        }
-                    }
-                    .opacity(showFeatures ? 1 : 0)
-                    .animation(.easeOut(duration: 0.6).delay(0.9), value: showFeatures)
-                    .padding(.vertical, 7)
-                }
-
                 let packages = offering.availablePackages.sorted(by: { $0.packageType.rawValue > $1.packageType.rawValue })
                 ForEach(packages, id: \.identifier) { package in
                     UltraCompactPackageCard(
@@ -420,6 +394,29 @@ public struct PaywallView: View {
             .opacity(showFeatures ? 1 : 0)
             .animation(.easeOut(duration: 0.6).delay(1.4), value: showFeatures)
 
+            if let offering, PaywallView.hasTrialOrPromotionalOffer(in: offering) {
+                HStack {
+                    Text(localized("paywall.remind_before_trial_ends", defaultValue: "Remind me before trial ends"))
+                        .font(typography.subtitle)
+                        .foregroundColor(primaryTextColor)
+
+                    Spacer()
+
+                    Toggle("", isOn: $remindBeforeTrialEnds)
+                        .labelsHidden()
+                        .toggleStyle(SwitchToggleStyle(tint: accentColor))
+                        .scaleEffect(0.8)
+                        .frame(width: 44, alignment: .trailing)
+                        .onChange(of: remindBeforeTrialEnds) { _, newValue in
+                            Task {
+                                await handleReminderToggleChange(newValue: newValue)
+                            }
+                        }
+                }
+                .opacity(showFeatures ? 1 : 0)
+                .animation(.easeOut(duration: 0.6).delay(1.6), value: showFeatures)
+            }
+
             VStack(spacing: 6) {
                 if configuration.privacyPolicyURL != nil || configuration.termsOfServiceURL != nil {
                     HStack(spacing: 8) {
@@ -465,10 +462,7 @@ public struct PaywallView: View {
     }
 
     private var ctaButtonText: String {
-        guard let selectedPackage else { return localized("paywall.cta.unlock_premium", defaultValue: "Unlock Premium") }
-        if showFreeTrial && selectedPackage.storeProduct.introductoryDiscount != nil {
-            return localized("paywall.cta.start_free_trial", defaultValue: "Start Free Trial")
-        }
+        guard selectedPackage != nil else { return localized("paywall.cta.unlock_premium", defaultValue: "Unlock Premium") }
         return localized("paywall.cta.unlock_premium", defaultValue: "Unlock Premium")
     }
 
@@ -504,19 +498,29 @@ public struct PaywallView: View {
 
     @MainActor
     private func selectInitialPackage(from offering: Offering) {
-        let initialSelection = PaywallView.initialSelection(from: offering)
-        showFreeTrial = initialSelection.showFreeTrial
-        selectedPackage = initialSelection.selected
+        selectedPackage = PaywallView.initialSelection(from: offering)
     }
 
     @MainActor
-    private func handleFreeTrialToggle(newValue: Bool) {
-        guard let offering else { return }
+    private func handleReminderToggleChange(newValue: Bool) async {
+        guard newValue else {
+            remindBeforeTrialEnds = false
+            return
+        }
 
-        if newValue {
-            selectedPackage = PaywallView.freeTrialPackage(from: offering) ?? offering.availablePackages.first
-        } else {
-            selectedPackage = PaywallView.preferredNonTrialPackage(from: offering)
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+
+        switch settings.authorizationStatus {
+        case .authorized, .provisional, .ephemeral:
+            remindBeforeTrialEnds = true
+        case .notDetermined:
+            let granted = (try? await center.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
+            remindBeforeTrialEnds = granted
+        case .denied:
+            remindBeforeTrialEnds = false
+        @unknown default:
+            remindBeforeTrialEnds = false
         }
     }
 
@@ -576,33 +580,18 @@ public struct PaywallView: View {
         openURL(url)
     }
 
-    private static func initialSelection(from offering: Offering?) -> (selected: Package?, showFreeTrial: Bool) {
-        guard let offering else { return (nil, false) }
-
-        if let freeTrial = freeTrialPackage(from: offering) {
-            return (freeTrial, true)
-        }
+    private static func initialSelection(from offering: Offering?) -> Package? {
+        guard let offering else { return nil }
 
         if let preferred = offering.availablePackages.first(where: { $0.packageType != .weekly }) {
-            return (preferred, false)
-        }
-
-        return (offering.availablePackages.first, false)
-    }
-
-    private static func freeTrialPackage(from offering: Offering) -> Package? {
-        if let weeklyTrial = offering.availablePackages.first(where: { $0.packageType == .weekly && $0.storeProduct.introductoryDiscount != nil }) {
-            return weeklyTrial
-        }
-        return offering.availablePackages.first(where: { $0.storeProduct.introductoryDiscount != nil })
-    }
-
-    private static func preferredNonTrialPackage(from offering: Offering) -> Package? {
-        let nonTrialPackages = offering.availablePackages.filter { $0.storeProduct.introductoryDiscount == nil }
-        if let preferred = nonTrialPackages.first(where: { $0.packageType != .weekly }) {
             return preferred
         }
-        return nonTrialPackages.first ?? offering.availablePackages.first
+
+        return offering.availablePackages.first
+    }
+
+    private static func hasTrialOrPromotionalOffer(in offering: Offering) -> Bool {
+        offering.availablePackages.contains(where: { $0.storeProduct.introductoryDiscount != nil })
     }
 
     private func localized(_ key: String, defaultValue: String) -> String {
