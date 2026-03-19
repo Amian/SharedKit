@@ -7,6 +7,26 @@ private struct PaywallPackageMarketingContent {
     let subtitleText: String?
 }
 
+private struct PaywallFloatingBadge: View {
+    let text: String
+    let compact: Bool
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: compact ? 11 : 12, weight: .bold))
+            .foregroundColor(.white)
+            .padding(.horizontal, compact ? 12 : 14)
+            .padding(.vertical, compact ? 6 : 7)
+            .background(Color.green)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(Color(red: 0.08, green: 0.38, blue: 0.16), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
+    }
+}
+
 private enum PaywallPackageMarketing {
     private struct SavingsComparison {
         let percentage: Int
@@ -250,16 +270,16 @@ struct CompactPremiumPackageCard: View {
         return marketingContent.badgeText?.uppercased()
     }
 
+    private var inlineTagLabel: String? {
+        hasFreeTrial ? nil : tagLabel
+    }
+
     private var defaultSubtitle: String? {
         marketingContent.subtitleText
     }
 
-    private var tagTextColor: Color {
-        hasFreeTrial ? .white : .black
-    }
-
     private var tagBackgroundColor: Color {
-        hasFreeTrial ? .green : .yellow
+        .yellow
     }
 
     var body: some View {
@@ -271,10 +291,10 @@ struct CompactPremiumPackageCard: View {
                             .font(typography.listTitle)
                             .foregroundColor(primaryTextColor)
 
-                        if let tagLabel {
-                            Text(tagLabel)
+                        if let inlineTagLabel {
+                            Text(inlineTagLabel)
                                 .font(typography.labelCaps)
-                                .foregroundColor(tagTextColor)
+                                .foregroundColor(.black)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
                                 .background(tagBackgroundColor)
@@ -328,6 +348,13 @@ struct CompactPremiumPackageCard: View {
                             )
                     )
             )
+            .overlay(alignment: .topTrailing) {
+                if hasFreeTrial, let tagLabel {
+                    PaywallFloatingBadge(text: tagLabel, compact: false)
+                        .offset(x: -14, y: -16)
+                }
+            }
+            .padding(.top, hasFreeTrial ? 16 : 0)
             .scaleEffect(isSelected ? 1.02 : 1.0)
             .animation(.easeInOut(duration: 0.2), value: isSelected)
         }
@@ -397,16 +424,16 @@ struct UltraCompactPackageCard: View {
         return marketingContent.badgeText?.uppercased()
     }
 
+    private var inlineTagLabel: String? {
+        hasFreeTrial ? nil : tagLabel
+    }
+
     private var defaultSubtitle: String? {
         marketingContent.subtitleText
     }
 
-    private var tagTextColor: Color {
-        hasFreeTrial ? .white : .black
-    }
-
     private var tagBackgroundColor: Color {
-        hasFreeTrial ? .green : .yellow
+        .yellow
     }
 
     private var cardFillColor: Color {
@@ -450,10 +477,10 @@ struct UltraCompactPackageCard: View {
                         .font(isSmallScreen ? typography.listSubtitle : typography.listTitle)
                         .foregroundColor(primaryTextColor)
 
-                        if let tagLabel {
-                            Text(tagLabel)
+                        if let inlineTagLabel {
+                            Text(inlineTagLabel)
                                 .font(typography.labelCaps)
-                                .foregroundColor(tagTextColor)
+                                .foregroundColor(.black)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 1)
                                 .background(tagBackgroundColor)
@@ -508,6 +535,13 @@ struct UltraCompactPackageCard: View {
                             )
                     )
             )
+            .overlay(alignment: .topTrailing) {
+                if hasFreeTrial, let tagLabel {
+                    PaywallFloatingBadge(text: tagLabel, compact: isSmallScreen)
+                        .offset(x: -10, y: -14)
+                }
+            }
+            .padding(.top, hasFreeTrial ? 14 : 0)
             .scaleEffect(isSelected ? 1.02 : 1.0)
             .animation(.easeInOut(duration: 0.2), value: isSelected)
         }
