@@ -323,6 +323,7 @@ public struct PaywallView: View {
                 ForEach(packages, id: \.identifier) { package in
                     UltraCompactPackageCard(
                             package: package,
+                            availablePackages: packages,
                             isSelected: selectedPackage?.identifier == package.identifier,
                             onSelect: { selectedPackage = package },
                             isSmallScreen: geometry.size.height < 700,
