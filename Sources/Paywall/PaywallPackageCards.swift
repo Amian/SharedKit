@@ -239,12 +239,27 @@ struct CompactPremiumPackageCard: View {
         )
     }
 
+    private var hasFreeTrial: Bool {
+        package.storeProduct.introductoryDiscount != nil
+    }
+
     private var tagLabel: String? {
-        marketingContent.badgeText?.uppercased()
+        if hasFreeTrial {
+            return paywallLocalization.string("paywall.package.free_trial_badge", defaultValue: "Free Trial").uppercased()
+        }
+        return marketingContent.badgeText?.uppercased()
     }
 
     private var defaultSubtitle: String? {
         marketingContent.subtitleText
+    }
+
+    private var tagTextColor: Color {
+        hasFreeTrial ? .white : .black
+    }
+
+    private var tagBackgroundColor: Color {
+        hasFreeTrial ? .green : .yellow
     }
 
     var body: some View {
@@ -259,10 +274,10 @@ struct CompactPremiumPackageCard: View {
                         if let tagLabel {
                             Text(tagLabel)
                                 .font(typography.labelCaps)
-                                .foregroundColor(.black)
+                                .foregroundColor(tagTextColor)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(Color.yellow)
+                                .background(tagBackgroundColor)
                                 .clipShape(RoundedRectangle(cornerRadius: 6))
                         }
                     }
@@ -371,12 +386,59 @@ struct UltraCompactPackageCard: View {
         )
     }
 
+    private var hasFreeTrial: Bool {
+        showFreeTrial && package.storeProduct.introductoryDiscount != nil
+    }
+
     private var tagLabel: String? {
-        marketingContent.badgeText?.uppercased()
+        if hasFreeTrial {
+            return paywallLocalization.string("paywall.package.free_trial_badge", defaultValue: "Free Trial").uppercased()
+        }
+        return marketingContent.badgeText?.uppercased()
     }
 
     private var defaultSubtitle: String? {
         marketingContent.subtitleText
+    }
+
+    private var tagTextColor: Color {
+        hasFreeTrial ? .white : .black
+    }
+
+    private var tagBackgroundColor: Color {
+        hasFreeTrial ? .green : .yellow
+    }
+
+    private var cardFillColor: Color {
+        if isSelected {
+            return accentColor.opacity(0.2)
+        }
+
+        if hasFreeTrial {
+            return accentColor.opacity(0.08)
+        }
+
+        return surfaceColor
+    }
+
+    private var cardStrokeColor: Color {
+        if isSelected {
+            return accentColor
+        }
+
+        if hasFreeTrial {
+            return accentColor.opacity(0.65)
+        }
+
+        return borderColor
+    }
+
+    private var cardStrokeWidth: CGFloat {
+        if isSelected {
+            return 2
+        }
+
+        return hasFreeTrial ? 1.5 : 1
     }
 
     var body: some View {
@@ -391,15 +453,15 @@ struct UltraCompactPackageCard: View {
                         if let tagLabel {
                             Text(tagLabel)
                                 .font(typography.labelCaps)
-                                .foregroundColor(.black)
+                                .foregroundColor(tagTextColor)
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 1)
-                                .background(Color.yellow)
+                                .background(tagBackgroundColor)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                     }
 
-                    if showFreeTrial, package.storeProduct.introductoryDiscount != nil {
+                    if hasFreeTrial {
                         Text(freeTrialDurationText)
                             .font(typography.subtitle)
                             .foregroundColor(secondaryTextColor)
@@ -416,26 +478,13 @@ struct UltraCompactPackageCard: View {
 
                 Spacer()
 
-                HStack(spacing: 4) {
-                    if package.storeProduct.introductoryDiscount != nil {
-                        Text(package.storeProduct.localizedPriceString)
-                            .font(typography.emphasisSecondary)
-                            .foregroundColor(.gray)
-                            .strikethrough()
-
-                        Text(paywallLocalization.string("paywall.package.free", defaultValue: "FREE"))
-                            .font(typography.emphasisPrimary)
-                            .foregroundColor(.green)
-                    } else {
-                        Text(package.storeProduct.localizedPriceString)
-                            .font(typography.emphasisPrimary)
-                            .foregroundColor(primaryTextColor)
-                    }
-                }
+                Text(package.storeProduct.localizedPriceString)
+                    .font(typography.emphasisPrimary)
+                    .foregroundColor(primaryTextColor)
 
                 ZStack {
                     Circle()
-                        .fill(isSelected ? accentColor : borderColor)
+                        .fill(isSelected ? accentColor : cardStrokeColor)
                         .frame(width: 16, height: 16)
 
                     if isSelected {
@@ -450,12 +499,12 @@ struct UltraCompactPackageCard: View {
             .padding(.vertical, isSmallScreen ? 8 : 10)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(isSelected ? accentColor.opacity(0.2) : surfaceColor)
+                    .fill(cardFillColor)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10)
                             .stroke(
-                                isSelected ? accentColor : borderColor,
-                                lineWidth: isSelected ? 2 : 1
+                                cardStrokeColor,
+                                lineWidth: cardStrokeWidth
                             )
                     )
             )

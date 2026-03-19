@@ -395,28 +395,28 @@ public struct PaywallView: View {
             .opacity(showFeatures ? 1 : 0)
             .animation(.easeOut(duration: 0.6).delay(1.4), value: showFeatures)
 
-            if let offering, PaywallView.hasTrialOrPromotionalOffer(in: offering) {
-                HStack {
-                    Text(localized("paywall.remind_before_trial_ends", defaultValue: "Remind me before trial ends"))
-                        .font(typography.subtitle)
-                        .foregroundColor(primaryTextColor)
-
-                    Spacer()
-
-                    Toggle("", isOn: $remindBeforeTrialEnds)
-                        .labelsHidden()
-                        .toggleStyle(SwitchToggleStyle(tint: accentColor))
-                        .scaleEffect(0.8)
-                        .frame(width: 44, alignment: .trailing)
-                        .onChange(of: remindBeforeTrialEnds) { _, newValue in
-                            Task {
-                                await handleReminderToggleChange(newValue: newValue)
-                            }
-                        }
-                }
-                .opacity(showFeatures ? 1 : 0)
-                .animation(.easeOut(duration: 0.6).delay(1.6), value: showFeatures)
-            }
+//            if let offering, PaywallView.hasTrialOrPromotionalOffer(in: offering) {
+//                HStack {
+//                    Text(localized("paywall.remind_before_trial_ends", defaultValue: "Remind me before trial ends"))
+//                        .font(typography.subtitle)
+//                        .foregroundColor(primaryTextColor)
+//
+//                    Spacer()
+//
+//                    Toggle("", isOn: $remindBeforeTrialEnds)
+//                        .labelsHidden()
+//                        .toggleStyle(SwitchToggleStyle(tint: accentColor))
+//                        .scaleEffect(0.8)
+//                        .frame(width: 44, alignment: .trailing)
+//                        .onChange(of: remindBeforeTrialEnds) { _, newValue in
+//                            Task {
+//                                await handleReminderToggleChange(newValue: newValue)
+//                            }
+//                        }
+//                }
+//                .opacity(showFeatures ? 1 : 0)
+//                .animation(.easeOut(duration: 0.6).delay(1.6), value: showFeatures)
+//            }
 
             VStack(spacing: 6) {
                 if configuration.privacyPolicyURL != nil || configuration.termsOfServiceURL != nil {
@@ -463,7 +463,14 @@ public struct PaywallView: View {
     }
 
     private var ctaButtonText: String {
-        guard selectedPackage != nil else { return localized("paywall.cta.unlock_premium", defaultValue: "Unlock Premium") }
+        guard let selectedPackage else {
+            return localized("paywall.cta.unlock_premium", defaultValue: "Unlock Premium")
+        }
+
+        if selectedPackage.storeProduct.introductoryDiscount != nil {
+            return localized("paywall.cta.start_free_trial", defaultValue: "Start Free Trial")
+        }
+
         return localized("paywall.cta.unlock_premium", defaultValue: "Unlock Premium")
     }
 
@@ -583,6 +590,10 @@ public struct PaywallView: View {
 
     private static func initialSelection(from offering: Offering?) -> Package? {
         guard let offering else { return nil }
+
+        if let trialPackage = offering.availablePackages.first(where: { $0.storeProduct.introductoryDiscount != nil }) {
+            return trialPackage
+        }
 
         if let preferred = offering.availablePackages.first(where: { $0.packageType != .weekly }) {
             return preferred
